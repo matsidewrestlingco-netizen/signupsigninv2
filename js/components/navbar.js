@@ -1,7 +1,10 @@
 export function loadNavbar() {
   console.log("loadNavbar() called");
 
-  fetch("./components/navbar.html")
+  // WORKS FROM ANY DIRECTORY IN YOUR STATIC SITE
+  const path = "/signupsigninv2/components/navbar.html";
+
+  fetch(path)
     .then(res => {
       console.log("fetch response:", res.status);
       return res.text();
