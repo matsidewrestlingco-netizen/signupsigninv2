@@ -13,12 +13,17 @@
       margin-bottom: 32px;
     }
 
+    .page-header h1 {
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
     .slot-form {
       background: var(--surface);
       padding: 24px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      margin-bottom: 40px;
+      margin-bottom: 32px;
       max-width: 650px;
     }
 
@@ -29,7 +34,9 @@
       margin-bottom: 6px;
     }
 
-    input, textarea, select {
+    input,
+    textarea,
+    select {
       width: 100%;
       padding: 10px;
       border: 1px solid var(--border);
@@ -46,19 +53,41 @@
       margin-top: 20px;
       display: flex;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .category-header {
-      font-size: 22px;
-      font-weight: 600;
+    .category-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-top: 32px;
       margin-bottom: 12px;
+    }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0, 92, 255, 0.08);
+      color: #005CFF;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
 
     .slot-card-actions {
       display: flex;
       gap: 10px;
       margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .slot-meta {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
     }
   </style>
 </head>
@@ -69,32 +98,33 @@
 
   <main class="container">
 
+    <!-- EVENT HEADER -->
     <section class="page-header">
       <a class="btn btn-light" href="events.html">← Back to Events</a>
       <h1 id="eventTitle">Loading…</h1>
       <p id="eventDate" class="helper-text"></p>
     </section>
 
-    <!-- SLOT CREATION FORM -->
+    <!-- SLOT CREATION / EDIT FORM -->
     <section class="slot-form">
-      <h2>Add Slot</h2>
+      <h2>Add / Edit Slot</h2>
 
-      <label>Slot Name</label>
+      <label for="slotName">Slot Name</label>
       <input type="text" id="slotName" placeholder="Example: Grill Station" />
 
-      <label>Category</label>
+      <label for="slotCategory">Category</label>
       <input type="text" id="slotCategory" placeholder="Example: Concessions" />
 
-      <label>Quantity</label>
+      <label for="slotQty">Quantity</label>
       <input type="number" id="slotQty" min="1" value="1" />
 
-      <label>Start Time (optional)</label>
+      <label for="slotStart">Start Time (optional)</label>
       <input type="datetime-local" id="slotStart" />
 
-      <label>End Time (optional)</label>
+      <label for="slotEnd">End Time (optional)</label>
       <input type="datetime-local" id="slotEnd" />
 
-      <label>Notes (optional)</label>
+      <label for="slotNotes">Notes (optional)</label>
       <textarea id="slotNotes" placeholder="Details, duties, etc."></textarea>
 
       <div class="button-row">
@@ -104,7 +134,25 @@
       </div>
 
       <p id="slotFormStatus" class="helper-text" style="margin-top:12px;"></p>
+    </section>
 
+    <!-- CATEGORY MANAGEMENT -->
+    <section class="slot-form">
+      <h2>Manage Categories</h2>
+
+      <label for="categorySelect">Existing Category</label>
+      <select id="categorySelect">
+        <option value="">Select a category…</option>
+      </select>
+
+      <label for="newCategoryName">New Category Name</label>
+      <input type="text" id="newCategoryName" placeholder="Enter new category name" />
+
+      <div class="button-row">
+        <button id="renameCategoryBtn" class="btn btn-secondary">Rename Category</button>
+      </div>
+
+      <p id="categoryStatus" class="helper-text" style="margin-top:12px;"></p>
     </section>
 
     <!-- SLOT LIST -->
@@ -127,7 +175,16 @@
     const slotListEl = document.getElementById("slotList");
     const statusEl = document.getElementById("slotFormStatus");
 
-    let editSlotId = null; // Tracks what we are editing
+    const addSlotBtn = document.getElementById("addSlotBtn");
+    const updateSlotBtn = document.getElementById("updateSlotBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+    const categorySelect = document.getElementById("categorySelect");
+    const newCategoryNameInput = document.getElementById("newCategoryName");
+    const categoryStatus = document.getElementById("categoryStatus");
+
+    let editSlotId = null;
+    let currentCategories = [];
 
     document.addEventListener("DOMContentLoaded", () => {
       loadEvent();
@@ -151,7 +208,6 @@
       }
 
       eventTitle.textContent = data.title;
-
       eventDate.textContent = new Date(data.start_time).toLocaleString([], {
         weekday: "long",
         month: "long",
@@ -166,6 +222,8 @@
     -------------------------- */
     async function loadSlots() {
       slotListEl.innerHTML = "<p>Loading slots…</p>";
+      currentCategories = [];
+      populateCategorySelect(); // clear it
 
       const { data, error } = await supabase
         .from("slots")
@@ -175,6 +233,7 @@
         .order("start_time", { ascending: true });
 
       if (error) {
+        console.error(error);
         slotListEl.innerHTML = "<p>Error loading slots.</p>";
         return;
       }
@@ -192,12 +251,21 @@
 
       const grouped = {};
       slots.forEach(slot => {
-        if (!grouped[slot.category]) grouped[slot.category] = [];
-        grouped[slot.category].push(slot);
+        const cat = slot.category || "Uncategorized";
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(slot);
       });
 
-      for (const category in grouped) {
-        slotListEl.innerHTML += `<h2 class="category-header">${category}</h2>`;
+      const categories = Object.keys(grouped);
+      currentCategories = categories;
+      populateCategorySelect();
+
+      categories.forEach(category => {
+        slotListEl.innerHTML += `
+          <div class="category-header-row">
+            <span class="category-badge">${category}</span>
+          </div>
+        `;
 
         grouped[category].forEach(slot => {
           const taken = slot.signups?.length || 0;
@@ -214,6 +282,7 @@
               }
 
               <p><strong>${remaining}</strong> spots remaining</p>
+              <p class="slot-meta">Filled: ${taken} / ${slot.quantity_total}</p>
 
               <div class="slot-card-actions">
                 <button class="btn btn-secondary edit-slot-btn" data-id="${slot.id}">Edit</button>
@@ -222,15 +291,15 @@
             </article>
           `;
         });
-      }
+      });
 
       attachSlotButtons();
     }
 
     /* -------------------------
-        ADD SLOT
+        SLOT FORM ACTIONS
     -------------------------- */
-    document.getElementById("addSlotBtn").addEventListener("click", async () => {
+    addSlotBtn.addEventListener("click", async () => {
       statusEl.textContent = "Adding slot…";
 
       const payload = getFormValues();
@@ -251,13 +320,15 @@
       }
 
       resetForm();
-      loadSlots();
+      await loadSlots();
       statusEl.textContent = "Slot added!";
     });
 
-    /* -------------------------
-        EDIT SLOT
-    -------------------------- */
+    cancelEditBtn.addEventListener("click", () => {
+      resetForm();
+      statusEl.textContent = "";
+    });
+
     function attachSlotButtons() {
       document.querySelectorAll(".edit-slot-btn").forEach(btn => {
         btn.addEventListener("click", () => startSlotEdit(btn.dataset.id));
@@ -270,6 +341,7 @@
 
     async function startSlotEdit(slotId) {
       editSlotId = slotId;
+      statusEl.textContent = "Editing slot…";
 
       const { data: slot, error } = await supabase
         .from("slots")
@@ -279,26 +351,23 @@
 
       if (error) {
         console.error(error);
+        statusEl.textContent = "Error loading slot for edit.";
         return;
       }
 
-      // Prefill form
-      document.getElementById("slotName").value = slot.name;
-      document.getElementById("slotCategory").value = slot.category;
-      document.getElementById("slotQty").value = slot.quantity_total;
+      document.getElementById("slotName").value = slot.name || "";
+      document.getElementById("slotCategory").value = slot.category || "";
+      document.getElementById("slotQty").value = slot.quantity_total || 1;
       document.getElementById("slotStart").value = slot.start_time || "";
       document.getElementById("slotEnd").value = slot.end_time || "";
       document.getElementById("slotNotes").value = slot.notes || "";
 
-      // Show update controls
-      document.getElementById("addSlotBtn").style.display = "none";
-      document.getElementById("updateSlotBtn").style.display = "inline-flex";
-      document.getElementById("cancelEditBtn").style.display = "inline-flex";
-
-      statusEl.textContent = "Editing slot…";
+      addSlotBtn.style.display = "none";
+      updateSlotBtn.style.display = "inline-flex";
+      cancelEditBtn.style.display = "inline-flex";
     }
 
-    document.getElementById("updateSlotBtn").addEventListener("click", async () => {
+    updateSlotBtn.addEventListener("click", async () => {
       if (!editSlotId) return;
 
       statusEl.textContent = "Updating slot…";
@@ -317,13 +386,10 @@
       }
 
       resetForm();
-      loadSlots();
+      await loadSlots();
       statusEl.textContent = "Slot updated!";
     });
 
-    /* -------------------------
-        DELETE SLOT
-    -------------------------- */
     async function deleteSlot(slotId) {
       if (!confirm("Delete this slot?")) return;
 
@@ -338,8 +404,58 @@
         return;
       }
 
-      loadSlots();
+      await loadSlots();
     }
+
+    /* -------------------------
+        CATEGORY MANAGEMENT
+    -------------------------- */
+    function populateCategorySelect() {
+      categorySelect.innerHTML = '<option value="">Select a category…</option>';
+
+      currentCategories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
+    }
+
+    document.getElementById("renameCategoryBtn").addEventListener("click", async () => {
+      const oldCat = categorySelect.value;
+      const newCat = newCategoryNameInput.value.trim();
+
+      if (!oldCat) {
+        categoryStatus.textContent = "Please select a category to rename.";
+        return;
+      }
+      if (!newCat) {
+        categoryStatus.textContent = "Please enter a new category name.";
+        return;
+      }
+      if (oldCat === newCat) {
+        categoryStatus.textContent = "Old and new names are the same.";
+        return;
+      }
+
+      categoryStatus.textContent = "Renaming category…";
+
+      const { error } = await supabase
+        .from("slots")
+        .update({ category: newCat })
+        .eq("event_id", eventId)
+        .eq("category", oldCat);
+
+      if (error) {
+        console.error(error);
+        categoryStatus.textContent = "Error renaming category.";
+        return;
+      }
+
+      newCategoryNameInput.value = "";
+      await loadSlots();
+      categoryStatus.textContent = `Category "${oldCat}" renamed to "${newCat}".`;
+    });
 
     /* -------------------------
         HELPERS
@@ -347,8 +463,8 @@
     function getFormValues() {
       return {
         name: document.getElementById("slotName").value.trim(),
-        category: document.getElementById("slotCategory").value.trim(),
-        quantity_total: parseInt(document.getElementById("slotQty").value),
+        category: document.getElementById("slotCategory").value.trim() || "Uncategorized",
+        quantity_total: parseInt(document.getElementById("slotQty").value, 10) || 1,
         start_time: document.getElementById("slotStart").value || null,
         end_time: document.getElementById("slotEnd").value || null,
         notes: document.getElementById("slotNotes").value.trim()
@@ -365,9 +481,9 @@
       document.getElementById("slotEnd").value = "";
       document.getElementById("slotNotes").value = "";
 
-      document.getElementById("addSlotBtn").style.display = "inline-flex";
-      document.getElementById("updateSlotBtn").style.display = "none";
-      document.getElementById("cancelEditBtn").style.display = "none";
+      addSlotBtn.style.display = "inline-flex";
+      updateSlotBtn.style.display = "none";
+      cancelEditBtn.style.display = "none";
     }
 
     function formatTime(value) {
