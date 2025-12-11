@@ -488,16 +488,24 @@
     /* -------------------------
         HELPERS
     -------------------------- */
+
+    function extractTime(val) {
+  if (!val) return null;
+  // val looks like "2025-01-01T17:30"
+  const parts = val.split("T")[1]; 
+  return parts ? parts + ":00" : null; 
+}
+    
     function getFormValues() {
-      return {
-        name: document.getElementById("slotName").value.trim(),
-        category: document.getElementById("slotCategory").value.trim(),
-        quantity_total: parseInt(document.getElementById("slotQty").value),
-        start_time: document.getElementById("slotStart").value || null,
-        end_time: document.getElementById("slotEnd").value || null,
-        notes: document.getElementById("slotNotes").value.trim()
-      };
-    }
+  return {
+    name: document.getElementById("slotName").value.trim(),
+    category: document.getElementById("slotCategory").value.trim(),
+    quantity_total: parseInt(document.getElementById("slotQty").value),
+    start_time: extractTime(document.getElementById("slotStart").value),
+    end_time: extractTime(document.getElementById("slotEnd").value),
+    notes: document.getElementById("slotNotes").value.trim()
+  };
+}
 
     function resetForm() {
       editSlotId = null;
@@ -524,4 +532,5 @@
 
 </body>
 </html>
+
 
