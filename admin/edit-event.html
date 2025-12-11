@@ -231,6 +231,9 @@
         .eq("event_id", eventId)
         .order("category", { ascending: true })
         .order("start_time", { ascending: true });
+        .order("sort_order", { ascending: true });
+      
+
 
       if (error) {
         console.error(error);
@@ -284,10 +287,20 @@
               <p><strong>${remaining}</strong> spots remaining</p>
               <p class="slot-meta">Filled: ${taken} / ${slot.quantity_total}</p>
 
-              <div class="slot-card-actions">
-                <button class="btn btn-secondary edit-slot-btn" data-id="${slot.id}">Edit</button>
-                <button class="btn btn-danger delete-slot-btn" data-id="${slot.id}">Delete</button>
-              </div>
+             <div class="slot-card-actions">
+
+              <button class="btn btn-light move-up-btn" data-id="${slot.id}" data-category="${slot.category}">
+                ↑ Move Up
+              </button>
+
+             <button class="btn btn-light move-down-btn" data-id="${slot.id}" data-category="${slot.category}">
+                ↓ Move Down
+             </button>
+
+  <button class="btn btn-secondary edit-slot-btn" data-id="${slot.id}">Edit</button>
+  <button class="btn btn-danger delete-slot-btn" data-id="${slot.id}">Delete</button>
+
+</div>
             </article>
           `;
         });
@@ -308,7 +321,15 @@
         statusEl.textContent = "Slot name and category are required.";
         return;
       }
-
+      
+      document.querySelectorAll(".move-up-btn").forEach(btn => {
+        btn.addEventListener("click", () => moveSlot(btn.dataset.id, btn.dataset.category, "up"));
+      });
+      
+      document.querySelectorAll(".move-down-btn").forEach(btn => {
+        btn.addEventListener("click", () => moveSlot(btn.dataset.id, btn.dataset.category, "down"));
+      });
+      
       const { error } = await supabase
         .from("slots")
         .insert({ ...payload, event_id: eventId });
@@ -492,7 +513,49 @@
         minute: "2-digit"
       });
     }
+
+    async function moveSlot(slotId, category, direction) {
+  // Load all slots for this event/category
+  const { data: slots, error } = await supabase
+    .from("slots")
+    .select("*")
+    .eq("event_id", eventId)
+    .eq("category", category)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // Find index of the slot we are moving
+  const index = slots.findIndex(s => s.id == slotId);
+  if (index === -1) return;
+
+  // Determine swap target
+  const swapIndex = direction === "up" ? index - 1 : index + 1;
+
+  // Out of bounds → do nothing
+  if (swapIndex < 0 || swapIndex >= slots.length) return;
+
+  const slotA = slots[index];
+  const slotB = slots[swapIndex];
+
+  // Swap the sort_order values
+  const updates = [
+    supabase.from("slots").update({ sort_order: slotB.sort_order }).eq("id", slotA.id),
+    supabase.from("slots").update({ sort_order: slotA.sort_order }).eq("id", slotB.id)
+  ];
+
+  await Promise.all(updates);
+
+  // Refresh
+  loadSlots();
+}
+
+    
   </script>
 
 </body>
 </html>
+
