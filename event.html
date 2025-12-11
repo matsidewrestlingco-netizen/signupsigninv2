@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event — signUPsignIN</title>
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+
+  <style>
+    .event-header {
+      margin-bottom: 32px;
+    }
+    .event-header h1 {
+      margin-bottom: 4px;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .event-date {
+      color: #555;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .event-description {
+      margin-top: 8px;
+      color: #444;
+      font-size: 15px;
+    }
+
+    .slot-category-header {
+      margin-top: 32px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #111;
+    }
+
+    .signup-form {
+      margin-top: 12px;
+      background: var(--surface-alt);
+      padding: 12px;
+      border-radius: var(--radius);
+    }
+
+    .signup-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .signup-row input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .signup-form textarea {
+      width: 100%;
+      height: 60px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      resize: vertical;
+      margin-bottom: 12px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="navbar"></div>
+
+  <main class="container">
+
+    <!-- EVENT HEADER -->
+    <section class="event-header">
+      <h1 id="eventTitle">Loading…</h1>
+      <p class="event-date" id="eventDate"></p>
+      <p class="event-description" id="eventDescription"></p>
+    </section>
+
+    <!-- SLOTS -->
+    <section id="slotList"></section>
+
+  </main>
+
+  <script type="module">
+    import { supabase } from "./js/supabaseClient.js";
+    import { loadNavbar } from "./js/components/navbar.js";
+
+    loadNavbar();
+
+    const titleEl = document.getElementById("eventTitle");
+    const dateEl = document.getElementById("eventDate");
+    const descEl = document.getElementById("eventDescription");
+    const slotListEl = document.getElementById("slotList");
+
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get("id");
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadEvent();
+      loadSlots();
+    });
+
+    async function loadEvent() {
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .eq("id", eventId)
+        .single();
+
+      if (error) {
+        console.error(error);
+        titleEl.textContent = "Event not found";
+        return;
+      }
+
+      titleEl.textContent = data.title;
+      dateEl.textContent = formatDate(data.start_time);
+      descEl.textContent = data.description || "";
+    }
+
+    async function loadSlots() {
+      slotListEl.innerHTML = "<p>Loading slots…</p>";
+
+      const { data: slots, error } = await supabase
+        .from("slots")
+        .select("*, signups(full_name)")
+        .eq("event_id", eventId)
+        .order("start_time", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        slotListEl.innerHTML = "<p>Error loading slots.</p>";
+        return;
+      }
+
+      if (!slots.length) {
+        slotListEl.innerHTML = "<p>No slots available.</p>";
+        return;
+      }
+
+      // Sort alphabetically by category
+      slots.sort((a, b) => a.category.localeCompare(b.category));
+
+      renderSlots(slots);
+    }
+
+    function renderSlots(slots) {
+      slotListEl.innerHTML = "";
+
+      const grouped = {};
+      slots.forEach(slot => {
+        if (!grouped[slot.category]) grouped[slot.category] = [];
+        grouped[slot.category].push(slot);
+      });
+
+      let html = "";
+
+      for (const category in grouped) {
+        html += `<h2 class="slot-category-header">${category}</h2>`;
+
+        grouped[category].forEach(slot => {
+          const filled = slot.signups?.length || 0;
+          const remaining = slot.quantity_total - filled;
+
+          const signupNames = filled
+            ? `<ul>${slot.signups.map(s => `<li>${s.full_name}</li>`).join("")}</ul>`
+            : `<p class="helper-text">No signups yet.</p>`;
+
+          html += `
+            <article class="card">
+              <h3>${slot.name}</h3>
+
+              ${
+                slot.start_time
+                  ? `<p><strong>${formatTime(slot.start_time)} – ${formatTime(slot.end_time)}</strong></p>`
+                  : ""
+              }
+
+              <p><strong>${remaining}</strong> spots remaining</p>
+
+              ${signupNames}
+
+              ${
+                remaining > 0
+                  ? `
+                    <button class="btn btn-primary signup-btn" data-slot="${slot.id}">
+                      Sign Up
+                    </button>
+
+                    <div class="signup-form" id="form-${slot.id}" style="display:none;">
+                      <div class="signup-row">
+                        <input type="text" class="input-name" placeholder="Your name">
+                        <input type="email" class="input-email" placeholder="Your email">
+                      </div>
+                      <textarea class="input-note" placeholder="Optional note"></textarea>
+                      <div class="button-row">
+                        <button class="btn btn-primary confirm-btn" data-slot="${slot.id}">Confirm</button>
+                        <button class="btn btn-secondary cancel-btn" data-slot="${slot.id}">Cancel</button>
+                      </div>
+                    </div>
+                  `
+                  : `<p class="helper-text">This slot is full.</p>`
+              }
+            </article>
+          `;
+        });
+
+        html += "<hr />";
+      }
+
+      slotListEl.innerHTML = html;
+
+      enableSignupButtons();
+    }
+
+    function enableSignupButtons() {
+      document.querySelectorAll(".signup-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const slotId = btn.dataset.slot;
+          btn.style.display = "none";
+          document.getElementById(`form-${slotId}`).style.display = "block";
+        });
+      });
+
+      document.querySelectorAll(".cancel-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const slotId = btn.dataset.slot;
+          document.getElementById(`form-${slotId}`).style.display = "none";
+          document.querySelector(`.signup-btn[data-slot="${slotId}"]`).style.display = "inline-flex";
+        });
+      });
+
+      document.querySelectorAll(".confirm-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const slotId = btn.dataset.slot;
+          await submitSignup(slotId);
+          await loadSlots(); // refresh UI
+        });
+      });
+    }
+
+    async function submitSignup(slotId) {
+      const form = document.getElementById(`form-${slotId}`);
+
+      const name = form.querySelector(".input-name").value.trim();
+      const email = form.querySelector(".input-email").value.trim();
+      const note = form.querySelector(".input-note").value.trim();
+
+      if (!name || !email) {
+        alert("Please enter your name and email.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("signups")
+        .insert({
+          slot_id: slotId,
+          event_id: eventId,
+          full_name: name,
+          email: email,
+          note: note
+        });
+
+      if (error) {
+        console.error(error);
+        alert("Signup failed. Please try again.");
+      }
+    }
+
+    function formatDate(val) {
+      return new Date(val).toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function formatTime(val) {
+      return new Date(val).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+  </script>
+
+</body>
+</html>
