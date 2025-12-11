@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>signUPsignIN</title>
+  <title>signUPsignIN — Events</title>
 
+  <!-- Base styles -->
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/components.css" />
@@ -11,44 +12,75 @@
 
 <body>
 
+  <!-- Navbar placeholder -->
   <div id="navbar"></div>
 
   <main class="container">
+
     <section class="section">
       <h1>Upcoming Events</h1>
-      <div id="eventList"></div>
+      <p class="helper-text">Choose an event below to view details and sign up for available slots.</p>
     </section>
+
+    <section id="eventList" class="section"></section>
+
   </main>
 
   <script type="module">
-    import { loadNavbar } from "./js/components/navbar.js";
     import { supabase } from "./js/supabaseClient.js";
+    import { loadNavbar } from "./js/components/navbar.js";
 
     loadNavbar();
 
     const eventList = document.getElementById("eventList");
 
     async function loadEvents() {
+      eventList.innerHTML = `<p>Loading events…</p>`;
+
       const { data, error } = await supabase
         .from("events")
         .select("*")
         .order("start_time", { ascending: true });
 
       if (error) {
-        eventList.innerHTML = "<p>Error loading events.</p>";
+        console.error(error);
+        eventList.innerHTML = `<p>Unable to load events.</p>`;
+        return;
+      }
+
+      if (!data.length) {
+        eventList.innerHTML = `
+          <div class="card">
+            <h3>No Upcoming Events</h3>
+            <p>Check back soon for new opportunities to volunteer or participate.</p>
+          </div>
+        `;
         return;
       }
 
       eventList.innerHTML = data
-        .map(
-          e => `
-          <div class="card">
-            <h3>${e.title}</h3>
-            <p>${new Date(e.start_time).toLocaleString()}</p>
-            <a class="btn btn-primary" href="event.html?id=${e.id}">View Event</a>
-          </div>
-        `
-        )
+        .map(event => {
+          const date = new Date(event.start_time).toLocaleString([], {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+          });
+
+          return `
+            <article class="card">
+              <h2>${event.title}</h2>
+              <p class="event-date">${date}</p>
+
+              <div class="button-row">
+                <a href="event.html?id=${event.id}" class="btn btn-primary">
+                  View Event
+                </a>
+              </div>
+            </article>
+          `;
+        })
         .join("");
     }
 
