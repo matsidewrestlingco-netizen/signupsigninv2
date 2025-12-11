@@ -1,7 +1,9 @@
 export function loadNavbar() {
-  fetch("/components/navbar.html")
+  fetch("./components/navbar.html")
     .then(res => res.text())
     .then(html => {
-      document.getElementById("navbar").innerHTML = html;
-    });
+      const target = document.getElementById("navbar");
+      if (target) target.innerHTML = html;
+    })
+    .catch(err => console.error("Navbar failed to load:", err));
 }
