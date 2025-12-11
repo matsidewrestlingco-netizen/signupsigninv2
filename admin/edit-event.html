@@ -13,11 +13,6 @@
       margin-bottom: 32px;
     }
 
-    .page-header h1 {
-      margin-top: 12px;
-      margin-bottom: 4px;
-    }
-
     .slot-form {
       background: var(--surface);
       padding: 24px;
@@ -34,9 +29,7 @@
       margin-bottom: 6px;
     }
 
-    input,
-    textarea,
-    select {
+    input, textarea, select {
       width: 100%;
       padding: 10px;
       border: 1px solid var(--border);
@@ -69,10 +62,10 @@
       align-items: center;
       padding: 4px 10px;
       border-radius: 999px;
-      background: rgba(0, 92, 255, 0.08);
+      background: rgba(0, 92, 255, 0.1);
       color: #005CFF;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: 0.03em;
       text-transform: uppercase;
     }
@@ -105,26 +98,26 @@
       <p id="eventDate" class="helper-text"></p>
     </section>
 
-    <!-- SLOT CREATION / EDIT FORM -->
+    <!-- SLOT FORM -->
     <section class="slot-form">
       <h2>Add / Edit Slot</h2>
 
-      <label for="slotName">Slot Name</label>
+      <label>Slot Name</label>
       <input type="text" id="slotName" placeholder="Example: Grill Station" />
 
-      <label for="slotCategory">Category</label>
+      <label>Category</label>
       <input type="text" id="slotCategory" placeholder="Example: Concessions" />
 
-      <label for="slotQty">Quantity</label>
+      <label>Quantity</label>
       <input type="number" id="slotQty" min="1" value="1" />
 
-      <label for="slotStart">Start Time (optional)</label>
+      <label>Start Time (optional)</label>
       <input type="datetime-local" id="slotStart" />
 
-      <label for="slotEnd">End Time (optional)</label>
+      <label>End Time (optional)</label>
       <input type="datetime-local" id="slotEnd" />
 
-      <label for="slotNotes">Notes (optional)</label>
+      <label>Notes (optional)</label>
       <textarea id="slotNotes" placeholder="Details, duties, etc."></textarea>
 
       <div class="button-row">
@@ -140,12 +133,12 @@
     <section class="slot-form">
       <h2>Manage Categories</h2>
 
-      <label for="categorySelect">Existing Category</label>
+      <label>Existing Category</label>
       <select id="categorySelect">
         <option value="">Select a category…</option>
       </select>
 
-      <label for="newCategoryName">New Category Name</label>
+      <label>New Category Name</label>
       <input type="text" id="newCategoryName" placeholder="Enter new category name" />
 
       <div class="button-row">
@@ -192,7 +185,7 @@
     });
 
     /* -------------------------
-        LOAD EVENT DATA
+        LOAD EVENT
     -------------------------- */
     async function loadEvent() {
       const { data, error } = await supabase
@@ -201,11 +194,7 @@
         .eq("id", eventId)
         .single();
 
-      if (error) {
-        console.error(error);
-        eventTitle.textContent = "Event not found";
-        return;
-      }
+      if (error) return;
 
       eventTitle.textContent = data.title;
       eventDate.textContent = new Date(data.start_time).toLocaleString([], {
@@ -218,31 +207,25 @@
     }
 
     /* -------------------------
-        LOAD & DISPLAY SLOTS
+        LOAD SLOTS
     -------------------------- */
     async function loadSlots() {
-      slotListEl.innerHTML = "<p>Loading slots…</p>";
-      currentCategories = [];
-      populateCategorySelect(); // clear it
+      slotListEl.innerHTML = "<p>Loading slots...</p>";
 
       const { data, error } = await supabase
         .from("slots")
         .select("*, signups(full_name)")
         .eq("event_id", eventId)
         .order("category", { ascending: true })
-        .order("start_time", { ascending: true });
         .order("sort_order", { ascending: true });
-      
-
 
       if (error) {
-        console.error(error);
         slotListEl.innerHTML = "<p>Error loading slots.</p>";
         return;
       }
 
       if (!data.length) {
-        slotListEl.innerHTML = "<p>No slots added yet.</p>";
+        slotListEl.innerHTML = "<p>No slots yet.</p>";
         return;
       }
 
@@ -251,6 +234,7 @@
 
     function renderSlots(slots) {
       slotListEl.innerHTML = "";
+      currentCategories = [];
 
       const grouped = {};
       slots.forEach(slot => {
@@ -259,18 +243,17 @@
         grouped[cat].push(slot);
       });
 
-      const categories = Object.keys(grouped);
-      currentCategories = categories;
+      currentCategories = Object.keys(grouped);
       populateCategorySelect();
 
-      categories.forEach(category => {
+      currentCategories.forEach(category => {
         slotListEl.innerHTML += `
           <div class="category-header-row">
             <span class="category-badge">${category}</span>
           </div>
         `;
 
-        grouped[category].forEach(slot => {
+        grouped[category].forEach((slot, index) => {
           const taken = slot.signups?.length || 0;
           const remaining = slot.quantity_total - taken;
 
@@ -287,20 +270,31 @@
               <p><strong>${remaining}</strong> spots remaining</p>
               <p class="slot-meta">Filled: ${taken} / ${slot.quantity_total}</p>
 
-             <div class="slot-card-actions">
+              <div class="slot-card-actions">
 
-              <button class="btn btn-light move-up-btn" data-id="${slot.id}" data-category="${slot.category}">
-                ↑ Move Up
-              </button>
+                <button class="btn btn-light move-up-btn"
+                        data-id="${slot.id}"
+                        data-category="${slot.category}">
+                  ↑ Move Up
+                </button>
 
-             <button class="btn btn-light move-down-btn" data-id="${slot.id}" data-category="${slot.category}">
-                ↓ Move Down
-             </button>
+                <button class="btn btn-light move-down-btn"
+                        data-id="${slot.id}"
+                        data-category="${slot.category}">
+                  ↓ Move Down
+                </button>
 
-  <button class="btn btn-secondary edit-slot-btn" data-id="${slot.id}">Edit</button>
-  <button class="btn btn-danger delete-slot-btn" data-id="${slot.id}">Delete</button>
+                <button class="btn btn-secondary edit-slot-btn"
+                        data-id="${slot.id}">
+                  Edit
+                </button>
 
-</div>
+                <button class="btn btn-danger delete-slot-btn"
+                        data-id="${slot.id}">
+                  Delete
+                </button>
+
+              </div>
             </article>
           `;
         });
@@ -310,46 +304,45 @@
     }
 
     /* -------------------------
-        SLOT FORM ACTIONS
+        ADD SLOT
     -------------------------- */
     addSlotBtn.addEventListener("click", async () => {
-      statusEl.textContent = "Adding slot…";
+      statusEl.textContent = "Adding slot...";
 
       const payload = getFormValues();
-
       if (!payload.name || !payload.category) {
-        statusEl.textContent = "Slot name and category are required.";
+        statusEl.textContent = "Name and category required.";
         return;
       }
-      
-      document.querySelectorAll(".move-up-btn").forEach(btn => {
-        btn.addEventListener("click", () => moveSlot(btn.dataset.id, btn.dataset.category, "up"));
-      });
-      
-      document.querySelectorAll(".move-down-btn").forEach(btn => {
-        btn.addEventListener("click", () => moveSlot(btn.dataset.id, btn.dataset.category, "down"));
-      });
-      
+
+      // Find highest sort_order in category
+      const { data: existing } = await supabase
+        .from("slots")
+        .select("sort_order")
+        .eq("event_id", eventId)
+        .eq("category", payload.category)
+        .order("sort_order", { ascending: false })
+        .limit(1);
+
+      payload.sort_order = existing?.[0]?.sort_order + 1 || 1;
+
       const { error } = await supabase
         .from("slots")
         .insert({ ...payload, event_id: eventId });
 
       if (error) {
-        console.error(error);
         statusEl.textContent = "Error adding slot.";
         return;
       }
 
       resetForm();
-      await loadSlots();
+      loadSlots();
       statusEl.textContent = "Slot added!";
     });
 
-    cancelEditBtn.addEventListener("click", () => {
-      resetForm();
-      statusEl.textContent = "";
-    });
-
+    /* -------------------------
+        EDIT SLOT
+    -------------------------- */
     function attachSlotButtons() {
       document.querySelectorAll(".edit-slot-btn").forEach(btn => {
         btn.addEventListener("click", () => startSlotEdit(btn.dataset.id));
@@ -358,27 +351,32 @@
       document.querySelectorAll(".delete-slot-btn").forEach(btn => {
         btn.addEventListener("click", () => deleteSlot(btn.dataset.id));
       });
+
+      document.querySelectorAll(".move-up-btn").forEach(btn => {
+        btn.addEventListener("click", () =>
+          moveSlot(btn.dataset.id, btn.dataset.category, "up")
+        );
+      });
+
+      document.querySelectorAll(".move-down-btn").forEach(btn => {
+        btn.addEventListener("click", () =>
+          moveSlot(btn.dataset.id, btn.dataset.category, "down")
+        );
+      });
     }
 
     async function startSlotEdit(slotId) {
       editSlotId = slotId;
-      statusEl.textContent = "Editing slot…";
 
-      const { data: slot, error } = await supabase
+      const { data: slot } = await supabase
         .from("slots")
         .select("*")
         .eq("id", slotId)
         .single();
 
-      if (error) {
-        console.error(error);
-        statusEl.textContent = "Error loading slot for edit.";
-        return;
-      }
-
-      document.getElementById("slotName").value = slot.name || "";
-      document.getElementById("slotCategory").value = slot.category || "";
-      document.getElementById("slotQty").value = slot.quantity_total || 1;
+      document.getElementById("slotName").value = slot.name;
+      document.getElementById("slotCategory").value = slot.category;
+      document.getElementById("slotQty").value = slot.quantity_total;
       document.getElementById("slotStart").value = slot.start_time || "";
       document.getElementById("slotEnd").value = slot.end_time || "";
       document.getElementById("slotNotes").value = slot.notes || "";
@@ -386,13 +384,11 @@
       addSlotBtn.style.display = "none";
       updateSlotBtn.style.display = "inline-flex";
       cancelEditBtn.style.display = "inline-flex";
+
+      statusEl.textContent = "Editing slot...";
     }
 
     updateSlotBtn.addEventListener("click", async () => {
-      if (!editSlotId) return;
-
-      statusEl.textContent = "Updating slot…";
-
       const payload = getFormValues();
 
       const { error } = await supabase
@@ -401,35 +397,60 @@
         .eq("id", editSlotId);
 
       if (error) {
-        console.error(error);
         statusEl.textContent = "Error updating slot.";
         return;
       }
 
       resetForm();
-      await loadSlots();
+      loadSlots();
       statusEl.textContent = "Slot updated!";
     });
 
+    cancelEditBtn.addEventListener("click", () => {
+      resetForm();
+      statusEl.textContent = "";
+    });
+
+    /* -------------------------
+        DELETE SLOT
+    -------------------------- */
     async function deleteSlot(slotId) {
       if (!confirm("Delete this slot?")) return;
 
-      const { error } = await supabase
-        .from("slots")
-        .delete()
-        .eq("id", slotId);
-
-      if (error) {
-        console.error(error);
-        alert("Error deleting slot.");
-        return;
-      }
-
-      await loadSlots();
+      await supabase.from("slots").delete().eq("id", slotId);
+      loadSlots();
     }
 
     /* -------------------------
-        CATEGORY MANAGEMENT
+        REORDER SLOTS
+    -------------------------- */
+    async function moveSlot(slotId, category, direction) {
+      const { data: slots } = await supabase
+        .from("slots")
+        .select("*")
+        .eq("event_id", eventId)
+        .eq("category", category)
+        .order("sort_order", { ascending: true });
+
+      const index = slots.findIndex(s => s.id == slotId);
+      if (index === -1) return;
+
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      if (swapIndex < 0 || swapIndex >= slots.length) return;
+
+      const slotA = slots[index];
+      const slotB = slots[swapIndex];
+
+      await Promise.all([
+        supabase.from("slots").update({ sort_order: slotB.sort_order }).eq("id", slotA.id),
+        supabase.from("slots").update({ sort_order: slotA.sort_order }).eq("id", slotB.id)
+      ]);
+
+      loadSlots();
+    }
+
+    /* -------------------------
+        CATEGORY RENAME
     -------------------------- */
     function populateCategorySelect() {
       categorySelect.innerHTML = '<option value="">Select a category…</option>';
@@ -446,36 +467,21 @@
       const oldCat = categorySelect.value;
       const newCat = newCategoryNameInput.value.trim();
 
-      if (!oldCat) {
-        categoryStatus.textContent = "Please select a category to rename.";
-        return;
-      }
-      if (!newCat) {
-        categoryStatus.textContent = "Please enter a new category name.";
-        return;
-      }
-      if (oldCat === newCat) {
-        categoryStatus.textContent = "Old and new names are the same.";
+      if (!oldCat || !newCat) {
+        categoryStatus.textContent = "Select a category and enter a new name.";
         return;
       }
 
-      categoryStatus.textContent = "Renaming category…";
-
-      const { error } = await supabase
+      await supabase
         .from("slots")
         .update({ category: newCat })
         .eq("event_id", eventId)
         .eq("category", oldCat);
 
-      if (error) {
-        console.error(error);
-        categoryStatus.textContent = "Error renaming category.";
-        return;
-      }
-
       newCategoryNameInput.value = "";
-      await loadSlots();
-      categoryStatus.textContent = `Category "${oldCat}" renamed to "${newCat}".`;
+      loadSlots();
+
+      categoryStatus.textContent = `Renamed "${oldCat}" → "${newCat}"`;
     });
 
     /* -------------------------
@@ -484,8 +490,8 @@
     function getFormValues() {
       return {
         name: document.getElementById("slotName").value.trim(),
-        category: document.getElementById("slotCategory").value.trim() || "Uncategorized",
-        quantity_total: parseInt(document.getElementById("slotQty").value, 10) || 1,
+        category: document.getElementById("slotCategory").value.trim(),
+        quantity_total: parseInt(document.getElementById("slotQty").value),
         start_time: document.getElementById("slotStart").value || null,
         end_time: document.getElementById("slotEnd").value || null,
         notes: document.getElementById("slotNotes").value.trim()
@@ -513,49 +519,7 @@
         minute: "2-digit"
       });
     }
-
-    async function moveSlot(slotId, category, direction) {
-  // Load all slots for this event/category
-  const { data: slots, error } = await supabase
-    .from("slots")
-    .select("*")
-    .eq("event_id", eventId)
-    .eq("category", category)
-    .order("sort_order", { ascending: true });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  // Find index of the slot we are moving
-  const index = slots.findIndex(s => s.id == slotId);
-  if (index === -1) return;
-
-  // Determine swap target
-  const swapIndex = direction === "up" ? index - 1 : index + 1;
-
-  // Out of bounds → do nothing
-  if (swapIndex < 0 || swapIndex >= slots.length) return;
-
-  const slotA = slots[index];
-  const slotB = slots[swapIndex];
-
-  // Swap the sort_order values
-  const updates = [
-    supabase.from("slots").update({ sort_order: slotB.sort_order }).eq("id", slotA.id),
-    supabase.from("slots").update({ sort_order: slotA.sort_order }).eq("id", slotB.id)
-  ];
-
-  await Promise.all(updates);
-
-  // Refresh
-  loadSlots();
-}
-
-    
   </script>
 
 </body>
 </html>
-
