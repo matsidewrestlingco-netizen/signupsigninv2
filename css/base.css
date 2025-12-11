@@ -1,0 +1,36 @@
+/* -------------------------------------------------------
+   BASE / RESET / TYPOGRAPHY
+-------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: #F7F8FA;
+  color: #2D2D2D;
+  line-height: 1.5;
+}
+
+/* COLOR SYSTEM */
+:root {
+  --primary: #005CFF;
+  --primary-hover: #0046CC;
+
+  --accent: #FF7A00;
+
+  --secondary: #6C757D;
+  --danger: #D9534F;
+
+  --surface: #FFFFFF;
+  --surface-alt: #F4F5F7;
+
+  --border: #E2E4E8;
+
+  --radius: 10px;
+}
