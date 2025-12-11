@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Event — signUPsignIN</title>
+
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+
+  <style>
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .slot-form {
+      background: var(--surface);
+      padding: 24px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 40px;
+      max-width: 650px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 15px;
+    }
+
+    textarea {
+      height: 70px;
+      resize: vertical;
+    }
+
+    .button-row {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .category-header {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+
+    .slot-card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="navbar"></div>
+
+  <main class="container">
+
+    <section class="page-header">
+      <a class="btn btn-light" href="events.html">← Back to Events</a>
+      <h1 id="eventTitle">Loading…</h1>
+      <p id="eventDate" class="helper-text"></p>
+    </section>
+
+    <!-- SLOT CREATION FORM -->
+    <section class="slot-form">
+      <h2>Add Slot</h2>
+
+      <label>Slot Name</label>
+      <input type="text" id="slotName" placeholder="Example: Grill Station" />
+
+      <label>Category</label>
+      <input type="text" id="slotCategory" placeholder="Example: Concessions" />
+
+      <label>Quantity</label>
+      <input type="number" id="slotQty" min="1" value="1" />
+
+      <label>Start Time (optional)</label>
+      <input type="datetime-local" id="slotStart" />
+
+      <label>End Time (optional)</label>
+      <input type="datetime-local" id="slotEnd" />
+
+      <label>Notes (optional)</label>
+      <textarea id="slotNotes" placeholder="Details, duties, etc."></textarea>
+
+      <div class="button-row">
+        <button id="addSlotBtn" class="btn btn-primary">Add Slot</button>
+        <button id="updateSlotBtn" class="btn btn-secondary" style="display:none;">Update Slot</button>
+        <button id="cancelEditBtn" class="btn btn-light" style="display:none;">Cancel</button>
+      </div>
+
+      <p id="slotFormStatus" class="helper-text" style="margin-top:12px;"></p>
+
+    </section>
+
+    <!-- SLOT LIST -->
+    <section id="slotList"></section>
+
+  </main>
+
+  <script type="module">
+    import { supabase } from "../js/supabaseClient.js";
+    import { loadNavbar } from "../js/components/navbar.js";
+
+    loadNavbar();
+
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get("id");
+
+    const eventTitle = document.getElementById("eventTitle");
+    const eventDate = document.getElementById("eventDate");
+
+    const slotListEl = document.getElementById("slotList");
+    const statusEl = document.getElementById("slotFormStatus");
+
+    let editSlotId = null; // Tracks what we are editing
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadEvent();
+      loadSlots();
+    });
+
+    /* -------------------------
+        LOAD EVENT DATA
+    -------------------------- */
+    async function loadEvent() {
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .eq("id", eventId)
+        .single();
+
+      if (error) {
+        console.error(error);
+        eventTitle.textContent = "Event not found";
+        return;
+      }
+
+      eventTitle.textContent = data.title;
+
+      eventDate.textContent = new Date(data.start_time).toLocaleString([], {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    /* -------------------------
+        LOAD & DISPLAY SLOTS
+    -------------------------- */
+    async function loadSlots() {
+      slotListEl.innerHTML = "<p>Loading slots…</p>";
+
+      const { data, error } = await supabase
+        .from("slots")
+        .select("*, signups(full_name)")
+        .eq("event_id", eventId)
+        .order("category", { ascending: true })
+        .order("start_time", { ascending: true });
+
+      if (error) {
+        slotListEl.innerHTML = "<p>Error loading slots.</p>";
+        return;
+      }
+
+      if (!data.length) {
+        slotListEl.innerHTML = "<p>No slots added yet.</p>";
+        return;
+      }
+
+      renderSlots(data);
+    }
+
+    function renderSlots(slots) {
+      slotListEl.innerHTML = "";
+
+      const grouped = {};
+      slots.forEach(slot => {
+        if (!grouped[slot.category]) grouped[slot.category] = [];
+        grouped[slot.category].push(slot);
+      });
+
+      for (const category in grouped) {
+        slotListEl.innerHTML += `<h2 class="category-header">${category}</h2>`;
+
+        grouped[category].forEach(slot => {
+          const taken = slot.signups?.length || 0;
+          const remaining = slot.quantity_total - taken;
+
+          slotListEl.innerHTML += `
+            <article class="card">
+              <h3>${slot.name}</h3>
+
+              ${
+                slot.start_time
+                  ? `<p><strong>${formatTime(slot.start_time)} – ${formatTime(slot.end_time)}</strong></p>`
+                  : ""
+              }
+
+              <p><strong>${remaining}</strong> spots remaining</p>
+
+              <div class="slot-card-actions">
+                <button class="btn btn-secondary edit-slot-btn" data-id="${slot.id}">Edit</button>
+                <button class="btn btn-danger delete-slot-btn" data-id="${slot.id}">Delete</button>
+              </div>
+            </article>
+          `;
+        });
+      }
+
+      attachSlotButtons();
+    }
+
+    /* -------------------------
+        ADD SLOT
+    -------------------------- */
+    document.getElementById("addSlotBtn").addEventListener("click", async () => {
+      statusEl.textContent = "Adding slot…";
+
+      const payload = getFormValues();
+
+      if (!payload.name || !payload.category) {
+        statusEl.textContent = "Slot name and category are required.";
+        return;
+      }
+
+      const { error } = await supabase
+        .from("slots")
+        .insert({ ...payload, event_id: eventId });
+
+      if (error) {
+        console.error(error);
+        statusEl.textContent = "Error adding slot.";
+        return;
+      }
+
+      resetForm();
+      loadSlots();
+      statusEl.textContent = "Slot added!";
+    });
+
+    /* -------------------------
+        EDIT SLOT
+    -------------------------- */
+    function attachSlotButtons() {
+      document.querySelectorAll(".edit-slot-btn").forEach(btn => {
+        btn.addEventListener("click", () => startSlotEdit(btn.dataset.id));
+      });
+
+      document.querySelectorAll(".delete-slot-btn").forEach(btn => {
+        btn.addEventListener("click", () => deleteSlot(btn.dataset.id));
+      });
+    }
+
+    async function startSlotEdit(slotId) {
+      editSlotId = slotId;
+
+      const { data: slot, error } = await supabase
+        .from("slots")
+        .select("*")
+        .eq("id", slotId)
+        .single();
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      // Prefill form
+      document.getElementById("slotName").value = slot.name;
+      document.getElementById("slotCategory").value = slot.category;
+      document.getElementById("slotQty").value = slot.quantity_total;
+      document.getElementById("slotStart").value = slot.start_time || "";
+      document.getElementById("slotEnd").value = slot.end_time || "";
+      document.getElementById("slotNotes").value = slot.notes || "";
+
+      // Show update controls
+      document.getElementById("addSlotBtn").style.display = "none";
+      document.getElementById("updateSlotBtn").style.display = "inline-flex";
+      document.getElementById("cancelEditBtn").style.display = "inline-flex";
+
+      statusEl.textContent = "Editing slot…";
+    }
+
+    document.getElementById("updateSlotBtn").addEventListener("click", async () => {
+      if (!editSlotId) return;
+
+      statusEl.textContent = "Updating slot…";
+
+      const payload = getFormValues();
+
+      const { error } = await supabase
+        .from("slots")
+        .update(payload)
+        .eq("id", editSlotId);
+
+      if (error) {
+        console.error(error);
+        statusEl.textContent = "Error updating slot.";
+        return;
+      }
+
+      resetForm();
+      loadSlots();
+      statusEl.textContent = "Slot updated!";
+    });
+
+    /* -------------------------
+        DELETE SLOT
+    -------------------------- */
+    async function deleteSlot(slotId) {
+      if (!confirm("Delete this slot?")) return;
+
+      const { error } = await supabase
+        .from("slots")
+        .delete()
+        .eq("id", slotId);
+
+      if (error) {
+        console.error(error);
+        alert("Error deleting slot.");
+        return;
+      }
+
+      loadSlots();
+    }
+
+    /* -------------------------
+        HELPERS
+    -------------------------- */
+    function getFormValues() {
+      return {
+        name: document.getElementById("slotName").value.trim(),
+        category: document.getElementById("slotCategory").value.trim(),
+        quantity_total: parseInt(document.getElementById("slotQty").value),
+        start_time: document.getElementById("slotStart").value || null,
+        end_time: document.getElementById("slotEnd").value || null,
+        notes: document.getElementById("slotNotes").value.trim()
+      };
+    }
+
+    function resetForm() {
+      editSlotId = null;
+
+      document.getElementById("slotName").value = "";
+      document.getElementById("slotCategory").value = "";
+      document.getElementById("slotQty").value = "1";
+      document.getElementById("slotStart").value = "";
+      document.getElementById("slotEnd").value = "";
+      document.getElementById("slotNotes").value = "";
+
+      document.getElementById("addSlotBtn").style.display = "inline-flex";
+      document.getElementById("updateSlotBtn").style.display = "none";
+      document.getElementById("cancelEditBtn").style.display = "none";
+    }
+
+    function formatTime(value) {
+      return new Date(value).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+  </script>
+
+</body>
+</html>
