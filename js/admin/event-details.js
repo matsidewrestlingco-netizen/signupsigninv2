@@ -6,30 +6,32 @@ loadNavbar();
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get("id");
 
+const eventTitle = document.getElementById("eventTitle");
+const eventDate = document.getElementById("eventDate");
+
 const form = document.getElementById("eventForm");
-const statusMsg = document.getElementById("statusMsg");
+const statusEl = document.getElementById("status");
 
 const titleInput = document.getElementById("title");
 const startInput = document.getElementById("start_time");
 const locationInput = document.getElementById("location");
-const descriptionInput = document.getElementById("description");
+const descInput = document.getElementById("description");
 
 const manageSlotsLink = document.getElementById("manageSlotsLink");
 const checkinLink = document.getElementById("checkinLink");
 
 if (!eventId) {
-  alert("Missing event ID");
-  throw new Error("Missing event ID");
+  statusEl.textContent = "Missing event ID.";
+  throw new Error("No event ID provided");
 }
 
-// Wire action links (static DOM — safe)
-manageSlotsLink.href =
-  `/signupsigninv2/admin/edit-event.html?id=${eventId}`;
+// Wire buttons
+manageSlotsLink.href = `/signupsigninv2/admin/edit-event.html?id=${eventId}`;
+checkinLink.href = `/signupsigninv2/admin/checkin.html?id=${eventId}`;
 
-checkinLink.href =
-  `/signupsigninv2/admin/checkin.html?id=${eventId}`;
-
-loadEvent();
+document.addEventListener("DOMContentLoaded", () => {
+  loadEvent();
+});
 
 async function loadEvent() {
   const { data: event, error } = await supabase
@@ -40,28 +42,35 @@ async function loadEvent() {
 
   if (error || !event) {
     console.error(error);
-    statusMsg.textContent = "Failed to load event.";
+    statusEl.textContent = "Unable to load event.";
+    eventTitle.textContent = "Event not found";
     return;
   }
 
+  // Header
+  eventTitle.textContent = event.title || "Event";
+  eventDate.textContent = formatDate(event.start_time);
+
+  // Form values
   titleInput.value = event.title || "";
-  startInput.value = event.start_time
-    ? event.start_time.slice(0, 16)
-    : "";
+  descInput.value = event.description || "";
   locationInput.value = event.location || "";
-  descriptionInput.value = event.description || "";
+
+  if (event.start_time) {
+    // Works with timestamptz ISO strings
+    startInput.value = event.start_time.slice(0, 16);
+  }
 }
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  statusMsg.textContent = "Saving…";
+  statusEl.textContent = "Saving…";
 
   const payload = {
     title: titleInput.value.trim(),
-    start_time: startInput.value,
+    description: descInput.value.trim(),
     location: locationInput.value.trim(),
-    description: descriptionInput.value.trim()
+    start_time: new Date(startInput.value).toISOString()
   };
 
   const { error } = await supabase
@@ -70,10 +79,25 @@ form.addEventListener("submit", async (e) => {
     .eq("id", eventId);
 
   if (error) {
-    console.error("SAVE ERROR:", error);
-    statusMsg.textContent = "Error saving changes.";
+    console.error("SUPABASE ERROR:", error);
+    console.error("PAYLOAD:", payload);
+    statusEl.textContent = "Error saving changes.";
     return;
   }
 
-  statusMsg.textContent = "Changes saved successfully.";
+  statusEl.textContent = "Changes saved successfully.";
+  // update header date/title immediately
+  eventTitle.textContent = payload.title || "Event";
+  eventDate.textContent = formatDate(payload.start_time);
 });
+
+function formatDate(ts) {
+  if (!ts) return "";
+  return new Date(ts).toLocaleString([], {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
