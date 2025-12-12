@@ -144,6 +144,16 @@
         <div class="dash-cta">Future</div>
       </div>
     </section>
+
+    <section style="margin-top:32px;">
+  <h2 style="margin-bottom:10px;">Upcoming Events</h2>
+  <div class="muted" style="margin-bottom:14px;">
+    Share these links with parents and volunteers.
+  </div>
+
+  <div id="upcomingEvents" class="dashboard-grid"></div>
+</section>
+    
   </main>
 
   <!-- AUTH GUARD -->
@@ -156,5 +166,88 @@
     import { loadNavbar } from "../js/components/navbar.js";
     loadNavbar();
   </script>
+
+<script type="module">
+  import { supabase } from "../js/supabaseClient.js";
+
+  const container = document.getElementById("upcomingEvents");
+  const BASE_URL = "https://matsidewrestlingco-netizen.github.io/signupsigninv2";
+
+  loadUpcomingEvents();
+
+  async function loadUpcomingEvents() {
+    const now = new Date().toISOString();
+
+    const { data: events, error } = await supabase
+      .from("events")
+      .select("id,title,start_time")
+      .gte("start_time", now)
+      .order("start_time", { ascending: true })
+      .limit(6);
+
+    if (error) {
+      console.error("Failed to load events:", error);
+      container.innerHTML = `<div class="muted">Unable to load upcoming events.</div>`;
+      return;
+    }
+
+    if (!events || events.length === 0) {
+      container.innerHTML = `<div class="muted">No upcoming events.</div>`;
+      return;
+    }
+
+    container.innerHTML = "";
+
+    for (const ev of events) {
+      const link = `${BASE_URL}/event.html?id=${ev.id}`;
+
+      const card = document.createElement("div");
+      card.className = "dash-card";
+
+      card.innerHTML = `
+        <div>
+          <div class="dash-title">${escapeHtml(ev.title)}</div>
+          <div class="muted">${formatDate(ev.start_time)}</div>
+          <input class="share-link" value="${link}" readonly
+            style="margin-top:10px;width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:12px;" />
+        </div>
+        <div class="dash-cta">
+          <button class="btn btn-secondary copy-btn">Copy Link</button>
+        </div>
+      `;
+
+      const btn = card.querySelector(".copy-btn");
+      const input = card.querySelector(".share-link");
+
+      btn.addEventListener("click", async () => {
+        input.select();
+        await navigator.clipboard.writeText(input.value);
+        btn.textContent = "Copied!";
+        setTimeout(() => (btn.textContent = "Copy Link"), 1500);
+      });
+
+      container.appendChild(card);
+    }
+  }
+
+  function formatDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleString([], {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+</script>
+  
 </body>
 </html>
