@@ -227,7 +227,15 @@
     </section>
   </main>
 
+<script type="module">
+  import { requireAuth } from "../js/admin/utils/auth.js";
+  await requireAuth();
+</script>
+
+<script type="module" src="../js/admin/reports.js"></script>
+  
   <script type="module" src="../js/admin/reports.js"></script>
 </body>
 </html>
+
 
