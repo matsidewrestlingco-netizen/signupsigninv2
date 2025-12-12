@@ -13,50 +13,60 @@
   <div id="navbar"></div>
 
   <main class="container">
-    <h1>Edit Event</h1>
-    <div class="muted" style="margin-bottom:16px;">
-      Update event details. Slot management is handled separately.
-    </div>
-
-    <section class="card">
-      <form id="eventForm" class="form-stack">
-  <div class="form-group">
-    <label class="form-label" for="title">Event Title</label>
-    <input id="title" class="input" required />
-  </div>
-
-  <div class="form-group">
-    <label class="form-label" for="start_time">Start Date & Time</label>
-    <input
-      id="start_time"
-      type="datetime-local"
-      class="input"
-      required
-    />
-  </div>
-
-  <div class="form-group">
-    <label class="form-label" for="description">Description</label>
-    <textarea
-      id="description"
-      class="input"
-      rows="4"
-      placeholder="Optional event notes…"
-    ></textarea>
-  </div>
-
-  <div class="form-actions">
-    <button class="btn btn-primary" type="submit">
-      Save Event
-    </button>
-
-    <a id="manageSlotsLink" class="btn btn-secondary">
-      Manage Slots
+    <!-- Back link -->
+    <a href="/signupsigninv2/admin/events.html" class="back-link">
+      ← Back to Events
     </a>
-  </div>
 
-  <div id="status" class="form-status"></div>
-</form>
+    <!-- Event header (matches edit-event.html) -->
+    <h1 id="eventTitleDisplay">—</h1>
+    <p id="eventDateDisplay" class="muted"></p>
+
+    <!-- Card -->
+    <section class="card">
+      <h2>Edit Event</h2>
+      <p class="muted">
+        Update event details. Slot management is handled separately.
+      </p>
+
+      <form id="eventForm" class="form-stack">
+        <div class="form-group">
+          <label class="form-label" for="title">Event Title</label>
+          <input id="title" class="input" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="start_time">Start Date & Time</label>
+          <input
+            id="start_time"
+            type="datetime-local"
+            class="input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Description</label>
+          <textarea
+            id="description"
+            class="input"
+            rows="4"
+            placeholder="Optional event notes…"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">
+            Save Event
+          </button>
+
+          <a id="manageSlotsLink" class="btn btn-secondary">
+            Manage Slots
+          </a>
+        </div>
+
+        <div id="status" class="form-status"></div>
+      </form>
     </section>
   </main>
 
@@ -66,6 +76,7 @@
     await requireAuth();
   </script>
 
+  <!-- Page logic -->
   <script type="module" src="../js/admin/event-details.js"></script>
 </body>
 </html>
