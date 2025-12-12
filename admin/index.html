@@ -213,23 +213,43 @@
       class="share-link"
       value="${link}"
       readonly
-      style="margin-top:10px;width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:12px;"
+      style="
+        margin-top:10px;
+        width:100%;
+        padding:8px;
+        border-radius:6px;
+        border:1px solid #ccc;
+        font-size:12px;
+      "
     />
 
-    <div style="margin-top:10px;">
-      <a
-        href="/signupsigninv2/admin/checkin-qr.html?id=${ev.id}"
-        class="btn btn-light"
-      >
-        Check-In QR
-      </a>
-    </div>
-  </div>
+    <button class="btn btn-secondary copy-btn" style="margin-top:10px;">
+      Copy Signup Link
+    </button>
 
-  <div class="dash-cta">
-    <button class="btn btn-secondary copy-btn">Copy Link</button>
+    <a
+      href="/signupsigninv2/admin/checkin-qr.html?id=${ev.id}"
+      class="btn btn-light"
+      style="margin-top:10px; display:inline-block;"
+    >
+      Check-In QR
+    </a>
   </div>
 `;
+
+const copyBtn = card.querySelector(".copy-btn");
+const input = card.querySelector(".share-link");
+
+copyBtn.addEventListener("click", () => {
+  input.select();
+  input.setSelectionRange(0, 99999); // mobile-safe
+  navigator.clipboard.writeText(input.value);
+
+  copyBtn.textContent = "Copied!";
+  setTimeout(() => {
+    copyBtn.textContent = "Copy Link";
+  }, 1200);
+});
       
       container.appendChild(card);
     }
