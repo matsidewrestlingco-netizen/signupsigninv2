@@ -19,23 +19,44 @@
     </div>
 
     <section class="card">
-      <form id="eventForm">
-        <label class="form-label">Event Title</label>
-        <input id="title" class="input" required />
+      <form id="eventForm" class="form-stack">
+  <div class="form-group">
+    <label class="form-label" for="title">Event Title</label>
+    <input id="title" class="input" required />
+  </div>
 
-        <label class="form-label">Start Date & Time</label>
-        <input id="start_time" type="datetime-local" class="input" required />
+  <div class="form-group">
+    <label class="form-label" for="start_time">Start Date & Time</label>
+    <input
+      id="start_time"
+      type="datetime-local"
+      class="input"
+      required
+    />
+  </div>
 
-        <label class="form-label">Description</label>
-        <textarea id="description" class="input" rows="4"></textarea>
+  <div class="form-group">
+    <label class="form-label" for="description">Description</label>
+    <textarea
+      id="description"
+      class="input"
+      rows="4"
+      placeholder="Optional event notes…"
+    ></textarea>
+  </div>
 
-        <div style="margin-top:16px; display:flex; gap:10px;">
-          <button class="btn btn-primary" type="submit">Save Event</button>
-          <a id="manageSlotsLink" class="btn btn-secondary">Manage Slots</a>
-        </div>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">
+      Save Event
+    </button>
 
-        <div id="status" class="muted" style="margin-top:10px;"></div>
-      </form>
+    <a id="manageSlotsLink" class="btn btn-secondary">
+      Manage Slots
+    </a>
+  </div>
+
+  <div id="status" class="form-status"></div>
+</form>
     </section>
   </main>
 
