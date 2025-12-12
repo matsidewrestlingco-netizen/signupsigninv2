@@ -7,6 +7,49 @@
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/layout.css" />
   <link rel="stylesheet" href="../css/components.css" />
+
+<style>
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .slot-form {
+    background: var(--surface);
+    padding: 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+    max-width: 650px;
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 15px;
+  }
+
+  textarea {
+    height: 90px;
+    resize: vertical;
+  }
+
+  .button-row {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+</style>
+  
 </head>
 
 <body>
@@ -14,16 +57,14 @@
 
   <main class="container">
     <!-- Back link -->
-    <a href="/signupsigninv2/admin/events.html" class="back-link">
-      ← Back to Events
-    </a>
-
-    <!-- Event header (matches edit-event.html) -->
-    <h1 id="eventTitleDisplay">—</h1>
-    <p id="eventDateDisplay" class="muted"></p>
+    <section class="page-header">
+      <a class="btn btn-light" href="events.html">← Back to Events</a>
+      <h1 id="eventTitleDisplay">—</h1>
+      <p id="eventDateDisplay" class="helper-text"></p>
+    </section>
 
     <!-- Card -->
-    <section class="card">
+    <section class="slot-form">
       <h2>Edit Event</h2>
       <p class="muted">
         Update event details. Slot management is handled separately.
@@ -35,7 +76,7 @@
           <input id="title" class="input" required />
         </div>
 
-        <div class="form-group">
+        ="form-group">
           <label class="form-label" for="start_time">Start Date & Time</label>
           <input
             id="start_time"
@@ -55,7 +96,7 @@
           ></textarea>
         </div>
 
-        <div class="form-actions">
+        <div class="button-row">
           <button class="btn btn-primary" type="submit">
             Save Event
           </button>
