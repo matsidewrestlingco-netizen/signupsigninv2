@@ -2,84 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Edit Event — signUPsignIN</title>
+  <title>Edit Event Details — signUPsignIN</title>
 
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/layout.css" />
   <link rel="stylesheet" href="../css/components.css" />
 
- 
+  <!-- Match edit-event.html look -->
+  <style>
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .slot-form {
+      background: var(--surface);
+      padding: 24px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+      max-width: 650px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 15px;
+    }
+
+    textarea {
+      height: 90px;
+      resize: vertical;
+    }
+
+    .button-row {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+  </style>
 </head>
 
 <body>
   <div id="navbar"></div>
 
- <div class="admin-layout">
-  <main class="admin-content">
+  <main class="container">
 
-    <div class="page-header">
-      <a href="/signupsigninv2/admin/events.html" class="back-link">
-        ← Back to Events
-      </a>
+    <!-- EVENT HEADER (same pattern as edit-event.html) -->
+    <section class="page-header">
+      <a class="btn btn-light" href="events.html">← Back to Events</a>
+      <h1 id="eventTitle">Loading…</h1>
+      <p id="eventDate" class="helper-text"></p>
+    </section>
 
-      <h1>Edit Event Details</h1>
+    <!-- EDIT EVENT FORM (styled like slot-form card) -->
+    <section class="slot-form">
+      <h2>Edit Event Details</h2>
 
-      <p class="page-subtitle">
-        Update event information. Slot management is handled separately.
-      </p>
-    </div>
+      <form id="eventForm">
+        <label>Event Title</label>
+        <input id="title" type="text" required />
 
-    <div class="card">
-      <form id="eventForm" class="admin-form">
+        <label>Start Date & Time</label>
+        <input id="start_time" type="datetime-local" required />
 
-        <div class="form-group">
-          <label>Event Title</label>
-          <input id="title" type="text" />
+        <label>Location</label>
+        <input id="location" type="text" placeholder="Optional (e.g., Shaler HS)" />
+
+        <label>Description</label>
+        <textarea id="description" placeholder="Optional event notes…"></textarea>
+
+        <div class="button-row">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <a id="manageSlotsLink" class="btn btn-secondary">Manage Slots</a>
+          <a id="checkinLink" class="btn btn-secondary">Check-In Volunteers</a>
         </div>
 
-        <div class="form-group">
-          <label>Start Date & Time</label>
-          <input id="start_time" type="datetime-local" />
-        </div>
-
-        <div class="form-group">
-          <label>Location</label>
-          <input id="location" type="text" />
-        </div>
-
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="description"></textarea>
-        </div>
-
-        <div class="admin-actions">
-          <button type="submit" class="btn btn-primary">
-            Save Changes
-          </button>
-
-          <a id="manageSlotsLink" class="btn btn-secondary">
-            Manage Slots
-          </a>
-
-          <a id="checkinLink" class="btn btn-secondary">
-            Check-In Volunteers
-          </a>
-        </div>
-
-        <div id="statusMsg" class="form-status"></div>
-
+        <p id="status" class="helper-text" style="margin-top:12px;"></p>
       </form>
-    </div>
+    </section>
 
   </main>
-</div>
 
-  <!-- Auth -->
+  <!-- Auth guard -->
   <script type="module">
     import { requireAuth } from "../js/admin/utils/auth.js";
     await requireAuth();
   </script>
 
+  <!-- Page logic -->
   <script type="module" src="../js/admin/event-details.js"></script>
 </body>
 </html>
