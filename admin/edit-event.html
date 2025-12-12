@@ -284,6 +284,11 @@
                   ↓ Move Down
                 </button>
 
+                <button class="btn btn-light duplicate-slot-btn"
+                        data-id="${slot.id}">
+                Duplicate
+                </button>
+
                 <button class="btn btn-secondary edit-slot-btn"
                         data-id="${slot.id}">
                   Edit
@@ -366,6 +371,11 @@
           moveSlot(btn.dataset.id, btn.dataset.category, "down")
         );
       });
+
+      document.querySelectorAll(".duplicate-slot-btn").forEach(btn => {
+        btn.addEventListener("click", () => duplicateSlot(btn.dataset.id));
+      });
+      
     }
 
     async function startSlotEdit(slotId) {
@@ -530,10 +540,61 @@
         minute: "2-digit"
       });
     }
+
+async function duplicateSlot(slotId) {
+  // 1. Load the slot we are duplicating
+  const { data: slot, error } = await supabase
+    .from("slots")
+    .select("*")
+    .eq("id", slotId)
+    .single();
+
+  if (error || !slot) {
+    alert("Unable to duplicate slot.");
+    return;
+  }
+
+  // 2. Find the highest sort_order in this category for this event
+  const { data: existing } = await supabase
+    .from("slots")
+    .select("sort_order")
+    .eq("event_id", eventId)
+    .eq("category", slot.category)
+    .order("sort_order", { ascending: false })
+    .limit(1);
+
+  const lastOrder =
+    existing && existing.length > 0 ? existing[0].sort_order : 0;
+
+  // 3. Insert duplicated slot
+  const { error: insertError } = await supabase
+    .from("slots")
+    .insert({
+      event_id: eventId,
+      name: slot.name,
+      category: slot.category,
+      quantity_total: slot.quantity_total,
+      start_time: slot.start_time,
+      end_time: slot.end_time,
+      description: slot.description,
+      sort_order: lastOrder + 1
+    });
+
+  if (insertError) {
+    console.error(insertError);
+    alert("Error duplicating slot.");
+    return;
+  }
+
+  // 4. Refresh UI
+  loadSlots();
+}
+    
   </script>
 
 </body>
 </html>
+
 
 
 
