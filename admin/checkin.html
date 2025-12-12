@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Volunteer Check-In — signUPsignIN</title>
+
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+
+  <style>
+    .checkin-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .slot-group {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: var(--surface);
+    }
+
+    .slot-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .signup-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .signup-row:last-child {
+      border-bottom: none;
+    }
+
+    .checkin-btn {
+      min-width: 120px;
+    }
+
+    .checked-in {
+      color: #0f7a3a;
+      font-weight: 700;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="navbar"></div>
+
+  <main class="container">
+    <a href="/signupsigninv2/admin/index.html" class="back-link">
+      ← Back to Admin
+    </a>
+
+    <h1 id="eventTitle">—</h1>
+    <p id="eventDate" class="muted"></p>
+
+    <section id="checkinContainer" class="checkin-list"></section>
+  </main>
+
+  <!-- Auth guard -->
+  <script type="module">
+    import { requireAuth } from "../js/admin/utils/auth.js";
+    await requireAuth();
+  </script>
+
+  <script type="module" src="../js/admin/checkin.js"></script>
+</body>
+</html>
