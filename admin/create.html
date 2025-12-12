@@ -89,6 +89,11 @@
   </main>
 
   <script type="module">
+  import { requireAuth } from "../js/admin/utils/auth.js";
+  await requireAuth();
+</script>
+
+  <script type="module">
     import { supabase } from "../js/supabaseClient.js";
     import { loadNavbar } from "../js/components/navbar.js";
 
@@ -140,3 +145,4 @@
 
 </body>
 </html>
+
