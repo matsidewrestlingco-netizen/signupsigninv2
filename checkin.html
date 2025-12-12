@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Volunteer Check-In</title>
+
+  <link rel="stylesheet" href="/signupsigninv2/css/base.css" />
+  <link rel="stylesheet" href="/signupsigninv2/css/layout.css" />
+  <link rel="stylesheet" href="/signupsigninv2/css/components.css" />
+
+  <style>
+    body {
+      background: var(--bg);
+    }
+
+    .slot-btn {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 8px;
+    }
+
+    .name-btn {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 6px;
+    }
+
+    .checked {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <section class="page-header">
+      <h1 id="eventTitle">Loading…</h1>
+      <p id="eventDate" class="helper-text"></p>
+    </section>
+
+    <section class="card">
+      <h2>Select Your Slot</h2>
+      <div id="slots"></div>
+    </section>
+
+    <section class="card" id="namesSection" style="display:none;">
+      <h2 id="slotTitle"></h2>
+
+      <input
+        id="search"
+        type="text"
+        placeholder="Search your name…"
+        style="margin-bottom:12px;"
+      />
+
+      <div id="names"></div>
+    </section>
+
+    <section class="card" id="successSection" style="display:none;">
+      <h2>✅ You’re checked in!</h2>
+      <p class="helper-text">Thank you for volunteering.</p>
+    </section>
+
+  </main>
+
+  <script type="module" src="/signupsigninv2/js/checkin.js"></script>
+</body>
+</html>
