@@ -34,35 +34,43 @@
 <body>
   <div id="navbar"></div>
 
-  <main class="container">
+  <main class="container admin-page">
+
+  <div class="page-header">
     <a href="/signupsigninv2/admin/events.html" class="back-link">
       ← Back to Events
     </a>
 
     <h1>Edit Event Details</h1>
+    <p class="page-subtitle">
+      Update event information. Slot management is handled separately.
+    </p>
+  </div>
 
-    <form id="eventForm" class="card form-grid">
-      <label>
-        <span>Event Title</span>
+  <section class="card admin-card">
+    <form id="eventForm" class="form-grid">
+
+      <div class="form-group">
+        <label>Event Title</label>
         <input id="title" type="text" required />
-      </label>
+      </div>
 
-      <label>
-        <span>Start Date & Time</span>
+      <div class="form-group">
+        <label>Start Date & Time</label>
         <input id="start_time" type="datetime-local" required />
-      </label>
+      </div>
 
-      <label>
-        <span>Location</span>
+      <div class="form-group">
+        <label>Location</label>
         <input id="location" type="text" />
-      </label>
+      </div>
 
-      <label>
-        <span>Description</span>
+      <div class="form-group">
+        <label>Description</label>
         <textarea id="description" rows="4"></textarea>
-      </label>
+      </div>
 
-      <div class="button-row">
+      <div class="button-row admin-actions">
         <button type="submit" class="btn btn-primary">
           Save Changes
         </button>
@@ -76,9 +84,11 @@
         </a>
       </div>
 
-      <div id="statusMsg" class="muted"></div>
+      <div id="statusMsg" class="form-status muted"></div>
     </form>
-  </main>
+  </section>
+
+</main>
 
   <!-- Auth -->
   <script type="module">
