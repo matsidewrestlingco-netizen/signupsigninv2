@@ -4,71 +4,56 @@
   <meta charset="UTF-8" />
   <title>Event — signUPsignIN</title>
 
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/components.css" />
 
   <style>
     .event-header {
+      border-left: 4px solid #005CFF;
+      padding-left: 16px;
       margin-bottom: 32px;
     }
+
     .event-header h1 {
-      margin-bottom: 4px;
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .event-date {
-      color: #555;
-      margin-bottom: 12px;
-      font-size: 16px;
-    }
-    .event-description {
-      margin-top: 8px;
-      color: #444;
-      font-size: 15px;
+      margin: 0 0 6px 0;
     }
 
-    .slot-category-header {
-      margin-top: 32px;
-      font-size: 22px;
+    .category-section {
+      margin-top: 36px;
+    }
+
+    .category-title {
+      font-size: 15px;
       font-weight: 600;
-      color: #111;
+      text-transform: uppercase;
+      color: #005CFF;
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .slot-actions {
+      margin-top: 12px;
     }
 
     .signup-form {
       margin-top: 12px;
-      background: var(--surface-alt);
-      padding: 12px;
-      border-radius: var(--radius);
-    }
-
-    .signup-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .signup-row input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-    }
-
-    .signup-form textarea {
-      width: 100%;
-      height: 60px;
-      padding: 8px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      resize: vertical;
-      margin-bottom: 12px;
-    }
-
-    hr {
-      border: none;
+      padding-top: 12px;
       border-top: 1px solid var(--border);
-      margin: 24px 0;
+    }
+
+    .signup-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .signup-status {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #666;
     }
   </style>
 </head>
@@ -82,12 +67,12 @@
     <!-- EVENT HEADER -->
     <section class="event-header">
       <h1 id="eventTitle">Loading…</h1>
-      <p class="event-date" id="eventDate"></p>
-      <p class="event-description" id="eventDescription"></p>
+      <p id="eventMeta" class="helper-text"></p>
+      <p id="eventDescription"></p>
     </section>
 
     <!-- SLOTS -->
-    <section id="slotList"></section>
+    <section id="slotsContainer"></section>
 
   </main>
 
@@ -97,19 +82,22 @@
 
     loadNavbar();
 
-    const titleEl = document.getElementById("eventTitle");
-    const dateEl = document.getElementById("eventDate");
-    const descEl = document.getElementById("eventDescription");
-    const slotListEl = document.getElementById("slotList");
-
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get("id");
+
+    const eventTitle = document.getElementById("eventTitle");
+    const eventMeta = document.getElementById("eventMeta");
+    const eventDescription = document.getElementById("eventDescription");
+    const slotsContainer = document.getElementById("slotsContainer");
 
     document.addEventListener("DOMContentLoaded", () => {
       loadEvent();
       loadSlots();
     });
 
+    /* -------------------------
+        LOAD EVENT
+    -------------------------- */
     async function loadEvent() {
       const { data, error } = await supabase
         .from("events")
@@ -118,179 +106,181 @@
         .single();
 
       if (error) {
-        console.error(error);
-        titleEl.textContent = "Event not found";
+        eventTitle.textContent = "Event not found";
         return;
       }
 
-      titleEl.textContent = data.title;
-      dateEl.textContent = formatDate(data.start_time);
-      descEl.textContent = data.description || "";
+      eventTitle.textContent = data.title;
+      eventMeta.textContent = new Date(data.start_time).toLocaleString([], {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+
+      eventDescription.textContent = data.description || "";
     }
 
+    /* -------------------------
+        LOAD SLOTS
+    -------------------------- */
     async function loadSlots() {
-      slotListEl.innerHTML = "<p>Loading slots…</p>";
+      slotsContainer.innerHTML = "<p>Loading slots…</p>";
 
       const { data: slots, error } = await supabase
         .from("slots")
         .select("*, signups(full_name)")
         .eq("event_id", eventId)
-        .order("start_time", { ascending: true });
+        .order("category", { ascending: true })
+        .order("sort_order", { ascending: true });
 
       if (error) {
-        console.error(error);
-        slotListEl.innerHTML = "<p>Error loading slots.</p>";
+        slotsContainer.innerHTML = "<p>Error loading slots.</p>";
         return;
       }
 
       if (!slots.length) {
-        slotListEl.innerHTML = "<p>No slots available.</p>";
+        slotsContainer.innerHTML = "<p>No volunteer slots available.</p>";
         return;
       }
-
-      // Sort alphabetically by category
-      slots.sort((a, b) => a.category.localeCompare(b.category));
 
       renderSlots(slots);
     }
 
+    /* -------------------------
+        RENDER SLOTS
+    -------------------------- */
     function renderSlots(slots) {
-      slotListEl.innerHTML = "";
+      slotsContainer.innerHTML = "";
 
       const grouped = {};
+
       slots.forEach(slot => {
-        if (!grouped[slot.category]) grouped[slot.category] = [];
-        grouped[slot.category].push(slot);
+        const category = slot.category || "Other";
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(slot);
       });
 
-      let html = "";
+      Object.keys(grouped).forEach(category => {
+        const section = document.createElement("div");
+        section.className = "category-section";
 
-      for (const category in grouped) {
-        html += `<h2 class="slot-category-header">${category}</h2>`;
+        section.innerHTML = `
+          <div class="category-title">${category}</div>
+        `;
 
         grouped[category].forEach(slot => {
-          const filled = slot.signups?.length || 0;
-          const remaining = slot.quantity_total - filled;
+          const taken = slot.signups?.length || 0;
+          const remaining = slot.quantity_total - taken;
+          const disabled = remaining <= 0;
 
-          const signupNames = filled
-            ? `<ul>${slot.signups.map(s => `<li>${s.full_name}</li>`).join("")}</ul>`
-            : `<p class="helper-text">No signups yet.</p>`;
+          const card = document.createElement("article");
+          card.className = "card";
 
-          html += `
-            <article class="card">
-              <h3>${slot.name}</h3>
+          card.innerHTML = `
+            <h3>${slot.name}</h3>
 
+            ${
+              slot.start_time
+                ? `<p><strong>${formatTime(slot.start_time)} – ${formatTime(slot.end_time)}</strong></p>`
+                : ""
+            }
+
+            <p>${remaining > 0 ? `<strong>${remaining}</strong> spots remaining` : `<strong>Full</strong>`}</p>
+
+            <div class="slot-actions">
               ${
-                slot.start_time
-                  ? `<p><strong>${formatTime(slot.start_time)} – ${formatTime(slot.end_time)}</strong></p>`
-                  : ""
+                disabled
+                  ? `<button class="btn btn-disabled" disabled>Full</button>`
+                  : `<button class="btn btn-primary signup-btn">Sign Up</button>`
               }
+            </div>
 
-              <p><strong>${remaining}</strong> spots remaining</p>
-
-              ${signupNames}
-
-              ${
-                remaining > 0
-                  ? `
-                    <button class="btn btn-primary signup-btn" data-slot="${slot.id}">
-                      Sign Up
-                    </button>
-
-                    <div class="signup-form" id="form-${slot.id}" style="display:none;">
-                      <div class="signup-row">
-                        <input type="text" class="input-name" placeholder="Your name">
-                        <input type="email" class="input-email" placeholder="Your email">
-                      </div>
-                      <textarea class="input-note" placeholder="Optional note"></textarea>
-                      <div class="button-row">
-                        <button class="btn btn-primary confirm-btn" data-slot="${slot.id}">Confirm</button>
-                        <button class="btn btn-secondary cancel-btn" data-slot="${slot.id}">Cancel</button>
-                      </div>
-                    </div>
-                  `
-                  : `<p class="helper-text">This slot is full.</p>`
-              }
-            </article>
+            ${
+              !disabled
+                ? `
+                <form class="signup-form" style="display:none;">
+                  <input type="text" placeholder="Your name" required />
+                  <input type="email" placeholder="Your email" required />
+                  <button class="btn btn-secondary submit-btn">Confirm</button>
+                  <div class="signup-status"></div>
+                </form>
+                `
+                : ""
+            }
           `;
+
+          if (!disabled) {
+            const signupBtn = card.querySelector(".signup-btn");
+            const form = card.querySelector(".signup-form");
+            const submitBtn = card.querySelector(".submit-btn");
+            const statusEl = card.querySelector(".signup-status");
+
+            signupBtn.addEventListener("click", () => {
+              form.style.display = form.style.display === "none" ? "block" : "none";
+            });
+
+            submitBtn.addEventListener("click", async (e) => {
+              e.preventDefault();
+
+              const name = form.querySelector("input[type=text]").value.trim();
+              const email = form.querySelector("input[type=email]").value.trim();
+
+              if (!name || !email) {
+                statusEl.textContent = "Please enter name and email.";
+                return;
+              }
+
+              statusEl.textContent = "Submitting…";
+
+              // Re-check capacity
+              const { data: fresh } = await supabase
+                .from("slots")
+                .select("quantity_total, signups(count)")
+                .eq("id", slot.id)
+                .single();
+
+              if (fresh.signups.length >= fresh.quantity_total) {
+                alert("Sorry — this slot just filled up.");
+                loadSlots();
+                return;
+              }
+
+              const { error } = await supabase
+                .from("signups")
+                .insert({
+                  slot_id: slot.id,
+                  full_name: name,
+                  email: email
+                });
+
+              if (error) {
+                statusEl.textContent = "Error submitting signup.";
+                return;
+              }
+
+              loadSlots();
+            });
+          }
+
+          section.appendChild(card);
         });
 
-        html += "<hr />";
-      }
-
-      slotListEl.innerHTML = html;
-
-      enableSignupButtons();
-    }
-
-    function enableSignupButtons() {
-      document.querySelectorAll(".signup-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const slotId = btn.dataset.slot;
-          btn.style.display = "none";
-          document.getElementById(`form-${slotId}`).style.display = "block";
-        });
-      });
-
-      document.querySelectorAll(".cancel-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const slotId = btn.dataset.slot;
-          document.getElementById(`form-${slotId}`).style.display = "none";
-          document.querySelector(`.signup-btn[data-slot="${slotId}"]`).style.display = "inline-flex";
-        });
-      });
-
-      document.querySelectorAll(".confirm-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const slotId = btn.dataset.slot;
-          await submitSignup(slotId);
-          await loadSlots(); // refresh UI
-        });
-      });
-    }
-
-    async function submitSignup(slotId) {
-      const form = document.getElementById(`form-${slotId}`);
-
-      const name = form.querySelector(".input-name").value.trim();
-      const email = form.querySelector(".input-email").value.trim();
-      const note = form.querySelector(".input-note").value.trim();
-
-      if (!name || !email) {
-        alert("Please enter your name and email.");
-        return;
-      }
-
-      const { error } = await supabase
-        .from("signups")
-        .insert({
-          slot_id: slotId,
-          event_id: eventId,
-          full_name: name,
-          email: email,
-          note: note
-        });
-
-      if (error) {
-        console.error(error);
-        alert("Signup failed. Please try again.");
-      }
-    }
-
-    function formatDate(val) {
-      return new Date(val).toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric"
+        slotsContainer.appendChild(section);
       });
     }
 
+    /* -------------------------
+        HELPERS
+    -------------------------- */
     function formatTime(val) {
-      return new Date(val).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit"
-      });
+      if (!val) return "";
+      const [h, m] = val.split(":");
+      const hour = parseInt(h, 10);
+      const suffix = hour >= 12 ? "PM" : "AM";
+      const displayHour = ((hour + 11) % 12 + 1);
+      return `${displayHour}:${m} ${suffix}`;
     }
   </script>
 
