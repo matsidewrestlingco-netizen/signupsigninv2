@@ -204,35 +204,31 @@
       const card = document.createElement("div");
       card.className = "dash-card";
 
-      card.innerHTML = `
-        <div>
-          <div class="dash-title">${escapeHtml(ev.title)}</div>
-          <div class="muted">${formatDate(ev.start_time)}</div>
-          <input class="share-link" value="${link}" readonly
-            style="margin-top:10px;width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:12px;" />
-        </div>
-        <div class="dash-cta">
-          <button class="btn btn-secondary copy-btn">Copy Link</button>
-        </div>
-      `;
+     card.innerHTML = `
+  <div>
+    <div class="dash-title">${escapeHtml(ev.title)}</div>
+    <div class="muted">${formatDate(ev.start_time)}</div>
 
-      const btn = card.querySelector(".copy-btn");
-      const input = card.querySelector(".share-link");
+    <input
+      class="share-link"
+      value="${link}"
+      readonly
+      style="margin-top:10px;width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:12px;"
+    />
 
-      btn.addEventListener("click", async () => {
-        input.select();
-        await navigator.clipboard.writeText(input.value);
-        btn.textContent = "Copied!";
-        setTimeout(() => (btn.textContent = "Copy Link"), 1500);
-      });
+    <div style="margin-top:10px;">
+      <a
+        href="/signupsigninv2/admin/checkin-qr.html?id=${ev.id}"
+        class="btn btn-light"
+      >
+        Check-In QR
+      </a>
+    </div>
+  </div>
 
-const checkinLink = `
-  <a
-    href="/signupsigninv2/admin/checkin-qr.html?id=${event.id}"
-    class="card-link"
-  >
-    Check-In QR
-  </a>
+  <div class="dash-cta">
+    <button class="btn btn-secondary copy-btn">Copy Link</button>
+  </div>
 `;
       
       container.appendChild(card);
