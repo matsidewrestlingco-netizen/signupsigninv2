@@ -226,6 +226,15 @@
         setTimeout(() => (btn.textContent = "Copy Link"), 1500);
       });
 
+const checkinLink = `
+  <a
+    href="/signupsigninv2/admin/checkin-qr.html?id=${event.id}"
+    class="card-link"
+  >
+    Check-In QR
+  </a>
+`;
+      
       container.appendChild(card);
     }
   }
