@@ -14,61 +14,65 @@
 <body>
   <div id="navbar"></div>
 
-  <main class="container admin-page">
+ <div class="admin-layout">
+  <main class="admin-content">
 
-  <div class="page-header">
-    <a href="/signupsigninv2/admin/events.html" class="back-link">
-      ← Back to Events
-    </a>
+    <div class="page-header">
+      <a href="/signupsigninv2/admin/events.html" class="back-link">
+        ← Back to Events
+      </a>
 
-    <h1>Edit Event Details</h1>
-    <p class="page-subtitle">
-      Update event information. Slot management is handled separately.
-    </p>
-  </div>
+      <h1>Edit Event Details</h1>
 
-  <section class="card admin-card">
-    <form id="eventForm" class="admin-form">
+      <p class="page-subtitle">
+        Update event information. Slot management is handled separately.
+      </p>
+    </div>
 
-      <div class="form-group">
-        <label>Event Title</label>
-        <input id="title" type="text" required />
-      </div>
+    <div class="card">
+      <form id="eventForm" class="admin-form">
 
-      <div class="form-group">
-        <label>Start Date & Time</label>
-        <input id="start_time" type="datetime-local" required />
-      </div>
+        <div class="form-group">
+          <label>Event Title</label>
+          <input id="title" type="text" />
+        </div>
 
-      <div class="form-group">
-        <label>Location</label>
-        <input id="location" type="text" />
-      </div>
+        <div class="form-group">
+          <label>Start Date & Time</label>
+          <input id="start_time" type="datetime-local" />
+        </div>
 
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="description" rows="4"></textarea>
-      </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input id="location" type="text" />
+        </div>
 
-     <div class="admin-actions">
-        <button type="submit" class="btn btn-primary">
-          Save Changes
-        </button>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="description"></textarea>
+        </div>
 
-        <a id="manageSlotsLink" class="btn btn-secondary">
-          Manage Slots
-        </a>
+        <div class="admin-actions">
+          <button type="submit" class="btn btn-primary">
+            Save Changes
+          </button>
 
-        <a id="checkinLink" class="btn btn-secondary">
-          Check-In Volunteers
-        </a>
-      </div>
+          <a id="manageSlotsLink" class="btn btn-secondary">
+            Manage Slots
+          </a>
 
-      <div id="statusMsg" class="form-status muted"></div>
-    </form>
-  </section>
+          <a id="checkinLink" class="btn btn-secondary">
+            Check-In Volunteers
+          </a>
+        </div>
 
-</main>
+        <div id="statusMsg" class="form-status"></div>
+
+      </form>
+    </div>
+
+  </main>
+</div>
 
   <!-- Auth -->
   <script type="module">
