@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Attendance Report</title>
+
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+</head>
+
+<body>
+  <div id="navbar"></div>
+
+  <main class="container">
+    <section class="page-header">
+      <h1>Attendance Report</h1>
+      <p class="helper-text" id="summary"></p>
+    </section>
+
+    <section class="card">
+      <table id="attendanceTable" class="data-table"></table>
+    </section>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "../js/admin/utils/auth.js";
+    import { loadNavbar } from "../js/components/navbar.js";
+    import { loadAttendance } from "../js/admin/reports/attendance.js";
+
+    await requireAuth();
+    loadNavbar();
+
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get("event_id");
+
+    loadAttendance({
+      eventId,
+      tableEl: document.getElementById("attendanceTable"),
+      summaryEl: document.getElementById("summary")
+    });
+  </script>
+</body>
+</html>
