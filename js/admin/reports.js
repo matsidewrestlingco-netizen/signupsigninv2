@@ -1,5 +1,5 @@
-import { supabase } from "../js/supabaseClient.js";
-import { loadNavbar } from "../js/components/navbar.js";
+import { supabase } from "../supabaseClient.js";
+import { loadNavbar } from "../components/navbar.js";
 
 loadNavbar();
 
@@ -458,3 +458,4 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
