@@ -168,6 +168,7 @@
           <option value="">Loading events…</option>
         </select>
         <button id="exportBtn" class="btn btn-secondary" disabled>Export CSV</button>
+        <button id="exportCsv" class="btn btn-light">Export CSV</button>
       </div>
     </div>
 
@@ -231,11 +232,29 @@
 <script type="module">
   import { requireAuth } from "../js/admin/utils/auth.js";
   await requireAuth();
+
+document.getElementById("exportCsv").onclick = () => {
+  const rows = [...document.querySelectorAll("table tr")]
+    .map(tr =>
+      [...tr.children].map(td => `"${td.innerText}"`).join(",")
+    )
+    .join("\n");
+
+  const blob = new Blob([rows], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "attendance.csv";
+  a.click();
+};
+  
 </script>
   
   <script type="module" src="../js/admin/reports.js"></script>
 </body>
 </html>
+
 
 
 
