@@ -47,11 +47,22 @@ async function loadEvent() {
   eventDateDisplay.textContent = formatDate(event.start_time);
 
   // Header action links
-  document.getElementById("checkinLink").href =
-  `/signupsigninv2/admin/checkin.html?id=${eventId}`;
+  function wireHeaderLinks(eventId) {
+  const checkinLink = document.getElementById("checkinLink");
+  const manageSlotsLink = document.getElementById("manageSlotsHeaderLink");
 
-  document.getElementById("manageSlotsHeaderLink").href =
-  `/signupsigninv2/admin/edit-event.html?id=${eventId}`;
+  if (checkinLink) {
+    checkinLink.href = `/signupsigninv2/admin/checkin.html?id=${eventId}`;
+  } else {
+    console.warn("checkinLink not found in DOM");
+  }
+
+  if (manageSlotsLink) {
+    manageSlotsLink.href = `/signupsigninv2/admin/edit-event.html?id=${eventId}`;
+  } else {
+    console.warn("manageSlotsHeaderLink not found in DOM");
+  }
+}
 
   // Form values
   titleInput.value = event.title || "";
@@ -87,6 +98,8 @@ form.addEventListener("submit", async (e) => {
 
   statusEl.textContent = "Event updated successfully.";
 });
+
+wireHeaderLinks(event.id);
 
 // Helpers
 function formatDate(ts) {
