@@ -46,6 +46,13 @@ async function loadEvent() {
   eventTitleDisplay.textContent = event.title || "Event";
   eventDateDisplay.textContent = formatDate(event.start_time);
 
+  // Header action links
+  document.getElementById("checkinLink").href =
+  `/signupsigninv2/admin/checkin.html?id=${eventId}`;
+
+  document.getElementById("manageSlotsHeaderLink").href =
+  `/signupsigninv2/admin/edit-event.html?id=${eventId}`;
+
   // Form values
   titleInput.value = event.title || "";
   descInput.value = event.description || "";
