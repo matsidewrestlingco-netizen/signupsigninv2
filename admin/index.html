@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard — signUPsignIN</title>
+
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+
+  <style>
+    .dashboard-head {
+      margin-bottom: 22px;
+    }
+
+    .dashboard-head h1 {
+      margin: 0 0 6px 0;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .dash-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .dash-card:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .dash-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .dash-desc {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .dash-cta {
+      margin-top: auto;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--primary);
+    }
+
+    .dash-disabled {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .badge-soon {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.06);
+      color: #555;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="navbar"></div>
+
+  <main class="container">
+    <div class="dashboard-head">
+      <h1>Admin Dashboard</h1>
+      <div class="muted">
+        Manage events, volunteers, and reporting for your organization.
+      </div>
+    </div>
+
+    <section class="dashboard-grid">
+      <!-- EVENTS -->
+      <a href="/signupsigninv2/admin/events.html" class="dash-card">
+        <div>
+          <div class="dash-title">Events</div>
+          <div class="dash-desc">
+            Create events, manage slots, ordering, and volunteer capacity.
+          </div>
+        </div>
+        <div class="dash-cta">Manage Events →</div>
+      </a>
+
+      <!-- REPORTS -->
+      <a href="/signupsigninv2/admin/reports.html" class="dash-card">
+        <div>
+          <div class="dash-title">Reports</div>
+          <div class="dash-desc">
+            View readiness, critical slots, and export volunteer rosters.
+          </div>
+        </div>
+        <div class="dash-cta">View Reports →</div>
+      </a>
+
+      <!-- USERS -->
+      <div class="dash-card dash-disabled">
+        <div>
+          <div class="dash-title">
+            User Management
+            <span class="badge-soon">Coming Soon</span>
+          </div>
+          <div class="dash-desc">
+            Invite admins, assign roles, and manage access.
+          </div>
+        </div>
+        <div class="dash-cta">Phase E.2</div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="dash-card dash-disabled">
+        <div>
+          <div class="dash-title">
+            Organization Settings
+            <span class="badge-soon">Coming Soon</span>
+          </div>
+          <div class="dash-desc">
+            Organization name, defaults, and preferences.
+          </div>
+        </div>
+        <div class="dash-cta">Future</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- AUTH GUARD -->
+  <script type="module">
+    import { requireAuth } from "../js/admin/utils/auth.js";
+    await requireAuth();
+  </script>
+
+  <script type="module">
+    import { loadNavbar } from "../js/components/navbar.js";
+    loadNavbar();
+  </script>
+</body>
+</html>
