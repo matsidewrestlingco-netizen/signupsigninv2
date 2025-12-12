@@ -12,44 +12,65 @@
 <body>
   <div id="navbar"></div>
 
-  <main class="container">
+<main class="container">
 
-    <section class="page-header">
-      <a href="/signupsigninv2/admin/index.html" class="btn btn-light">
-        ← Back to Admin
+  <!-- PAGE HEADER (matches other admin pages) -->
+  <section class="page-header">
+    <a href="/signupsigninv2/admin/index.html" class="btn btn-light">
+      ← Back to Admin
+    </a>
+
+    <h1 id="eventTitle">Loading…</h1>
+
+    <p id="eventDate" class="helper-text"></p>
+  </section>
+
+  <!-- PRIMARY CARD (same feel as edit-event / reports) -->
+  <section class="card" style="max-width:650px;">
+    <h2>Volunteer Check-In</h2>
+
+    <p class="helper-text">
+      Display this QR code for volunteers to check in on arrival.
+    </p>
+
+    <div
+      id="qrContainer"
+      style="margin:24px auto;text-align:center;"
+    ></div>
+
+    <label class="helper-text">Check-In Link</label>
+
+    <input
+      id="checkinUrl"
+      type="text"
+      readonly
+      style="
+        margin-top:6px;
+        margin-bottom:16px;
+        width:100%;
+        padding:10px;
+        border-radius:6px;
+        border:1px solid var(--border);
+        font-size:13px;
+      "
+    />
+
+    <div class="button-row">
+      <button id="copyBtn" class="btn btn-secondary">
+        Copy Link
+      </button>
+
+      <a
+        id="openBtn"
+        class="btn btn-primary"
+        target="_blank"
+      >
+        Open Check-In Page
       </a>
+    </div>
+  </section>
 
-      <h1 id="eventTitle">Loading…</h1>
-      <p id="eventDate" class="helper-text"></p>
-    </section>
-
-    <section class="card" style="max-width:520px;">
-      <h2>Volunteer Check-In</h2>
-      <p class="helper-text">
-        Display this QR code for volunteers to check in.
-      </p>
-
-      <div id="qrContainer" style="margin:24px 0;text-align:center;"></div>
-
-      <input
-        id="checkinUrl"
-        type="text"
-        readonly
-        style="margin-bottom:12px;"
-      />
-
-      <div class="button-row">
-        <button id="copyBtn" class="btn btn-secondary">
-          Copy Link
-        </button>
-
-        <a id="openBtn" class="btn btn-primary" target="_blank">
-          Open Check-In Page
-        </a>
-      </div>
-    </section>
-
-  </main>
+</main>
 
   <!-- Auth guard -->
   <script type="module">
