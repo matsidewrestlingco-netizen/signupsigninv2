@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login — signUPsignIN</title>
+
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+
+  <style>
+    .login-wrap { max-width: 420px; margin: 60px auto; }
+    .login-wrap h1 { margin: 0 0 8px 0; }
+    .login-wrap .muted { color:#666; font-size:13px; margin-bottom:18px; }
+    .login-card { padding: 18px; }
+    .login-card input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .status { margin-top: 10px; font-size: 13px; color: #666; }
+  </style>
+</head>
+
+<body>
+  <div id="navbar"></div>
+
+  <main class="container">
+    <div class="login-wrap">
+      <h1>Admin Login</h1>
+      <div class="muted">Sign in to manage events, slots, and reports.</div>
+
+      <section class="card login-card">
+        <form id="loginForm">
+          <input id="email" type="email" placeholder="Email" autocomplete="email" required />
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password" required />
+          <button class="btn btn-primary" type="submit" style="width:100%;">Sign In</button>
+          <div id="status" class="status"></div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="../js/admin/login.js"></script>
+</body>
+</html>
