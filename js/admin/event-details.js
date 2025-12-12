@@ -6,25 +6,28 @@ loadNavbar();
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get("id");
 
-const titleEl = document.getElementById("eventTitle");
-const dateEl = document.getElementById("eventDate");
-const locationEl = document.getElementById("eventLocation");
-const descriptionEl = document.getElementById("eventDescription");
+const form = document.getElementById("eventForm");
+const statusMsg = document.getElementById("statusMsg");
 
-const checkinLink = document.getElementById("checkinLink");
+const titleInput = document.getElementById("title");
+const startInput = document.getElementById("start_time");
+const locationInput = document.getElementById("location");
+const descriptionInput = document.getElementById("description");
+
 const manageSlotsLink = document.getElementById("manageSlotsLink");
+const checkinLink = document.getElementById("checkinLink");
 
 if (!eventId) {
-  titleEl.textContent = "Event not found";
+  alert("Missing event ID");
   throw new Error("Missing event ID");
 }
 
-// Wire header links safely (elements guaranteed by static HTML)
-checkinLink.href =
-  `/signupsigninv2/admin/checkin.html?id=${eventId}`;
-
+// Wire action links (static DOM — safe)
 manageSlotsLink.href =
   `/signupsigninv2/admin/edit-event.html?id=${eventId}`;
+
+checkinLink.href =
+  `/signupsigninv2/admin/checkin.html?id=${eventId}`;
 
 loadEvent();
 
@@ -37,24 +40,40 @@ async function loadEvent() {
 
   if (error || !event) {
     console.error(error);
-    titleEl.textContent = "Event not found";
+    statusMsg.textContent = "Failed to load event.";
     return;
   }
 
-  titleEl.textContent = event.title;
-  dateEl.textContent = formatDate(event.start_time);
-
-  locationEl.textContent = event.location || "—";
-  descriptionEl.textContent = event.description || "—";
+  titleInput.value = event.title || "";
+  startInput.value = event.start_time
+    ? event.start_time.slice(0, 16)
+    : "";
+  locationInput.value = event.location || "";
+  descriptionInput.value = event.description || "";
 }
 
-function formatDate(ts) {
-  if (!ts) return "—";
-  return new Date(ts).toLocaleString([], {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit"
-  });
-}
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  statusMsg.textContent = "Saving…";
+
+  const payload = {
+    title: titleInput.value.trim(),
+    start_time: startInput.value,
+    location: locationInput.value.trim(),
+    description: descriptionInput.value.trim()
+  };
+
+  const { error } = await supabase
+    .from("events")
+    .update(payload)
+    .eq("id", eventId);
+
+  if (error) {
+    console.error("SAVE ERROR:", error);
+    statusMsg.textContent = "Error saving changes.";
+    return;
+  }
+
+  statusMsg.textContent = "Changes saved successfully.";
+});
