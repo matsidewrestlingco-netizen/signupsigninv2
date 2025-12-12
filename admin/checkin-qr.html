@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Check-In QR — signUPsignIN</title>
+
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+</head>
+
+<body>
+  <div id="navbar"></div>
+
+  <main class="container">
+
+    <section class="page-header">
+      <a href="/signupsigninv2/admin/index.html" class="btn btn-light">
+        ← Back to Admin
+      </a>
+
+      <h1 id="eventTitle">Loading…</h1>
+      <p id="eventDate" class="helper-text"></p>
+    </section>
+
+    <section class="card" style="max-width:520px;">
+      <h2>Volunteer Check-In</h2>
+      <p class="helper-text">
+        Display this QR code for volunteers to check in.
+      </p>
+
+      <div id="qrContainer" style="margin:24px 0;text-align:center;"></div>
+
+      <input
+        id="checkinUrl"
+        type="text"
+        readonly
+        style="margin-bottom:12px;"
+      />
+
+      <div class="button-row">
+        <button id="copyBtn" class="btn btn-secondary">
+          Copy Link
+        </button>
+
+        <a id="openBtn" class="btn btn-primary" target="_blank">
+          Open Check-In Page
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Auth guard -->
+  <script type="module">
+    import { requireAuth } from "../js/admin/utils/auth.js";
+    await requireAuth();
+  </script>
+
+  <!-- QR + page logic -->
+  <script type="module" src="../js/admin/checkin-qr.js"></script>
+</body>
+</html>
