@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Event — signUPsignIN</title>
+
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+</head>
+
+<body>
+  <div id="navbar"></div>
+
+  <main class="container">
+    <h1>Edit Event</h1>
+    <div class="muted" style="margin-bottom:16px;">
+      Update event details. Slot management is handled separately.
+    </div>
+
+    <section class="card">
+      <form id="eventForm">
+        <label class="form-label">Event Title</label>
+        <input id="title" class="input" required />
+
+        <label class="form-label">Start Date & Time</label>
+        <input id="start_time" type="datetime-local" class="input" required />
+
+        <label class="form-label">Description</label>
+        <textarea id="description" class="input" rows="4"></textarea>
+
+        <div style="margin-top:16px; display:flex; gap:10px;">
+          <button class="btn btn-primary" type="submit">Save Event</button>
+          <a id="manageSlotsLink" class="btn btn-secondary">Manage Slots</a>
+        </div>
+
+        <div id="status" class="muted" style="margin-top:10px;"></div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Auth guard -->
+  <script type="module">
+    import { requireAuth } from "../js/admin/utils/auth.js";
+    await requireAuth();
+  </script>
+
+  <script type="module" src="../js/admin/event-details.js"></script>
+</body>
+</html>
