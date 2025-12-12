@@ -2,42 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Event Details — signUPsignIN</title>
+  <title>Edit Event — signUPsignIN</title>
 
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/layout.css" />
   <link rel="stylesheet" href="../css/components.css" />
 
   <style>
+    .form-grid {
+      max-width: 720px;
+      display: grid;
+      gap: 16px;
+    }
+
     .button-row {
       display: flex;
       gap: 12px;
-      margin: 16px 0 24px;
       flex-wrap: wrap;
+      margin-top: 20px;
     }
 
-    .details-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      max-width: 700px;
-    }
-
-    .details-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-    }
-
-    .details-label {
+    label span {
+      display: block;
       font-size: 12px;
       color: var(--muted);
       margin-bottom: 4px;
-    }
-
-    .details-value {
-      font-weight: 600;
     }
   </style>
 </head>
@@ -50,35 +39,48 @@
       ← Back to Events
     </a>
 
-    <h1 id="eventTitle">Loading…</h1>
-    <p id="eventDate" class="muted"></p>
+    <h1>Edit Event Details</h1>
 
-    <!-- ACTION BUTTONS -->
-    <div class="button-row">
-      <a id="checkinLink" class="btn btn-primary">
-        Check-In Volunteers
-      </a>
+    <form id="eventForm" class="card form-grid">
+      <label>
+        <span>Event Title</span>
+        <input id="title" type="text" required />
+      </label>
 
-      <a id="manageSlotsLink" class="btn btn-secondary">
-        Manage Slots
-      </a>
-    </div>
+      <label>
+        <span>Start Date & Time</span>
+        <input id="start_time" type="datetime-local" required />
+      </label>
 
-    <!-- EVENT DETAILS -->
-    <section class="details-grid">
-      <div class="details-item">
-        <div class="details-label">Location</div>
-        <div class="details-value" id="eventLocation">—</div>
+      <label>
+        <span>Location</span>
+        <input id="location" type="text" />
+      </label>
+
+      <label>
+        <span>Description</span>
+        <textarea id="description" rows="4"></textarea>
+      </label>
+
+      <div class="button-row">
+        <button type="submit" class="btn btn-primary">
+          Save Changes
+        </button>
+
+        <a id="manageSlotsLink" class="btn btn-secondary">
+          Manage Slots
+        </a>
+
+        <a id="checkinLink" class="btn btn-secondary">
+          Check-In Volunteers
+        </a>
       </div>
 
-      <div class="details-item">
-        <div class="details-label">Description</div>
-        <div class="details-value" id="eventDescription">—</div>
-      </div>
-    </section>
+      <div id="statusMsg" class="muted"></div>
+    </form>
   </main>
 
-  <!-- Auth guard -->
+  <!-- Auth -->
   <script type="module">
     import { requireAuth } from "../js/admin/utils/auth.js";
     await requireAuth();
@@ -87,4 +89,3 @@
   <script type="module" src="../js/admin/event-details.js"></script>
 </body>
 </html>
-
