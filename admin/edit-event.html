@@ -332,9 +332,11 @@
         .insert({ ...payload, event_id: eventId });
 
       if (error) {
-        statusEl.textContent = "Error adding slot.";
-        return;
-      }
+  console.error("SUPABASE ERROR:", error);
+  console.error("PAYLOAD THAT FAILED:", payload);
+  statusEl.textContent = "Error adding slot.";
+  return;
+}
 
       resetForm();
       loadSlots();
@@ -532,5 +534,6 @@
 
 </body>
 </html>
+
 
 
