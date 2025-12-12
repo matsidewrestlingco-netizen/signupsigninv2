@@ -179,3 +179,62 @@
   background: #fdecea;
   color: #a30000;
 }
+
+/* -------------------------------------------------------
+   SPLASH
+-------------------------------------------------------- */
+
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.splash-overlay.hidden {
+  display: none;
+}
+
+.splash-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.splash-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.splash-sub {
+  color: #666;
+  margin-bottom: 18px;
+}
+
+.splash-points {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.splash-points div {
+  margin-bottom: 6px;
+}
+
+.splash-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
