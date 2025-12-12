@@ -2,139 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Edit Event — signUPsignIN</title>
+  <title>Event Details — signUPsignIN</title>
 
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/layout.css" />
   <link rel="stylesheet" href="../css/components.css" />
 
-<style>
-  .page-header {
-    margin-bottom: 32px;
-  }
+  <style>
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0 24px;
+      flex-wrap: wrap;
+    }
 
-  .slot-form {
-    background: var(--surface);
-    padding: 24px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    margin-bottom: 32px;
-    max-width: 650px;
-  }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 700px;
+    }
 
-  label {
-    font-weight: 600;
-    display: block;
-    margin-top: 16px;
-    margin-bottom: 6px;
-  }
+    .details-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+    }
 
-  input, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 15px;
-  }
+    .details-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
 
-  textarea {
-    height: 90px;
-    resize: vertical;
-  }
-
-  .button-row {
-    margin-top: 20px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-</style>
-  
+    .details-value {
+      font-weight: 600;
+    }
+  </style>
 </head>
 
 <body>
   <div id="navbar"></div>
 
   <main class="container">
-    <!-- Back link -->
-    <section class="page-header">
-      <a class="btn btn-light" href="events.html">← Back to Events</a>
-      <h1 id="eventTitleDisplay">—</h1>
-      <p id="eventDateDisplay" class="helper-text"></p>
-    </section>
+    <a href="/signupsigninv2/admin/events.html" class="back-link">
+      ← Back to Events
+    </a>
 
-  <!-- TEST -->
-    
-<div class="button-row">
-  <a
-    id="checkinLink"
-    href="#"
-    class="btn btn-primary"
-  >
-    Check-In Volunteers
-  </a>
+    <h1 id="eventTitle">Loading…</h1>
+    <p id="eventDate" class="muted"></p>
 
-  <a
-    id="manageSlotsHeaderLink"
-    href="#"
-    class="btn btn-secondary"
-  >
-    Manage Slots
-  </a>
-</div>
+    <!-- ACTION BUTTONS -->
+    <div class="button-row">
+      <a id="checkinLink" class="btn btn-primary">
+        Check-In Volunteers
+      </a>
 
-  <!-- TEST -->
-    
-    <!-- Card -->
-    <section class="slot-form">
-      <h2>Edit Event</h2>
-      <p class="muted">
-        Update event details. Slot management is handled separately.
-      </p>
+      <a id="manageSlotsLink" class="btn btn-secondary">
+        Manage Slots
+      </a>
+    </div>
 
-      <form id="eventForm" class="form-stack">
-        <div class="form-group">
-          <label class="form-label" for="title">Event Title</label>
-          <input id="title" class="input" required />
-        </div>
+    <!-- EVENT DETAILS -->
+    <section class="details-grid">
+      <div class="details-item">
+        <div class="details-label">Location</div>
+        <div class="details-value" id="eventLocation">—</div>
+      </div>
 
-        <div class="form-group">
-          <label class="form-label" for="start_time">Start Date & Time</label>
-          <input
-            id="start_time"
-            type="datetime-local"
-            class="input"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="description">Description</label>
-          <textarea
-            id="description"
-            class="input"
-            rows="4"
-            placeholder="Optional event notes…"
-          ></textarea>
-        </div>
-
-          <div class="button-row">
-          <button class="btn btn-primary" type="submit">
-            Save Event
-          </button>
-
-          <div class="button-row">
-  <a id="checkinLink" class="btn btn-primary">
-    Check-In Volunteers
-  </a>
-
-  <a id="manageSlotsHeaderLink" class="btn btn-secondary">
-    Manage Slots
-  </a>
-</div>
-
-        <div id="status" class="form-status"></div>
-      </form>
+      <div class="details-item">
+        <div class="details-label">Description</div>
+        <div class="details-value" id="eventDescription">—</div>
+      </div>
     </section>
   </main>
 
@@ -144,7 +84,6 @@
     await requireAuth();
   </script>
 
-  <!-- Page logic -->
-<script type="module" src="../js/admin/event-details.js"></script>
+  <script type="module" src="../js/admin/event-details.js"></script>
 </body>
 </html>
