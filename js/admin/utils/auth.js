@@ -10,7 +10,7 @@ export async function requireAuth() {
       window.location.pathname + window.location.search
     );
     window.location.href =
-      `/signupsigninv2/admin/login.html?next=${next}`;
+      `/admin/login.html?next=${next}`;
     return null;
   }
 
@@ -19,7 +19,7 @@ export async function requireAuth() {
 
 export async function logout() {
   await supabase.auth.signOut();
-  window.location.href = "/signupsigninv2/admin/login.html";
+  window.location.href = "/admin/login.html";
 }
 
 
