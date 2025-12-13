@@ -2,7 +2,7 @@ export function loadNavbar() {
   console.log("loadNavbar() called");
 
   // WORKS FROM ANY DIRECTORY IN YOUR STATIC SITE
-  const path = "/signupsigninv2/components/navbar.html";
+  const path = "/components/navbar.html";
 
   fetch(path)
     .then(res => {
