@@ -112,10 +112,10 @@
       <input type="number" id="slotQty" min="1" value="1" />
 
       <label>Start Time (optional)</label>
-      <input type="datetime-local" id="slotStart" />
+      <input type="time" id="slotStart" />
 
       <label>End Time (optional)</label>
-      <input type="datetime-local" id="slotEnd" />
+      <input type="time" id="slotEnd" />
 
       <label>Notes (optional)</label>
       <textarea id="slotNotes" placeholder="Details, duties, etc."></textarea>
@@ -395,8 +395,12 @@
       document.getElementById("slotName").value = slot.name;
       document.getElementById("slotCategory").value = slot.category;
       document.getElementById("slotQty").value = slot.quantity_total;
-      document.getElementById("slotStart").value = slot.start_time || "";
-      document.getElementById("slotEnd").value = slot.end_time || "";
+      document.getElementById("slotStart").value = slot.start_time
+      ? slot.start_time.slice(0, 5) // "08:00"
+      : "";
+      document.getElementById("slotEnd").value = slot.end_time
+      ? slot.end_time.slice(0, 5)
+      : "";
       document.getElementById("slotNotes").value = slot.notes || "";
 
       addSlotBtn.style.display = "none";
@@ -506,20 +510,20 @@
         HELPERS
     -------------------------- */
 
-    function extractTime(val) {
-  if (!val) return null;
-  // val looks like "2025-01-01T17:30"
-  const parts = val.split("T")[1]; 
-  return parts ? parts + ":00" : null; 
-}
+    /* function extractTime(val) {*/
+  /* if (!val) return null;*/
+  /* // val looks like "2025-01-01T17:30"*/
+  /* const parts = val.split("T")[1]; */
+  /* return parts ? parts + ":00" : null; */
+/* }*/
     
     function getFormValues() {
   return {
     name: document.getElementById("slotName").value.trim(),
     category: document.getElementById("slotCategory").value.trim(),
     quantity_total: parseInt(document.getElementById("slotQty").value),
-    start_time: extractTime(document.getElementById("slotStart").value),
-    end_time: extractTime(document.getElementById("slotEnd").value),
+    start_time: document.getElementById("slotStart").value || null,
+    end_time: document.getElementById("slotEnd").value || null,
     description: document.getElementById("slotNotes").value.trim()
   };
 }
@@ -540,11 +544,13 @@
     }
 
     function formatTime(value) {
-      return new Date(value).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit"
-      });
-    }
+    if (!value) return "";
+    const [h, m] = value.split(":");
+    const hour = Number(h);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${m} ${ampm}`;
+  }
 
 async function duplicateSlot(slotId) {
   // 1. Load the slot we are duplicating
@@ -599,6 +605,7 @@ async function duplicateSlot(slotId) {
 
 </body>
 </html>
+
 
 
 
