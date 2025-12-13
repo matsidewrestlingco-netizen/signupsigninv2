@@ -1,7 +1,11 @@
 import { supabase } from "../supabaseClient.js";
 import { loadNavbar } from "../components/navbar.js";
+import { loadFooter } from "/js/components/footer.js";
+
 
 loadNavbar();
+loadFooter();
+
 
 const params = new URLSearchParams(window.location.search);
 const eventId = params.get("id");
