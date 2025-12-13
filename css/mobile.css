@@ -1,0 +1,263 @@
+/* =====================================================
+   signUPsignIN — Mobile Overrides
+   SAFE: Mobile-only, desktop untouched
+   Breakpoint: <= 768px
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+  /* -----------------------------
+     Global Safety + Usability
+     ----------------------------- */
+
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  body {
+    font-size: 16px; /* prevents iOS zoom */
+  }
+
+  button,
+  .btn,
+  .button {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  a {
+    touch-action: manipulation;
+  }
+
+  /* -----------------------------
+     Layout + Containers
+     ----------------------------- */
+
+  .container,
+  .page,
+  .page-container {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  /* Cards */
+  .card {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  /* -----------------------------
+     Grid / Columns → Stack
+     ----------------------------- */
+
+  .grid,
+  .grid-2,
+  .grid-3,
+  .two-column,
+  .three-column {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .row,
+  .flex-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* -----------------------------
+     Navbar
+     ----------------------------- */
+
+  .navbar {
+    padding: 12px 16px;
+  }
+
+  .nav-left,
+  .nav-right {
+    gap: 12px;
+  }
+
+  .nav-logo {
+    height: 32px;
+    width: auto;
+  }
+
+  .nav-right a {
+    font-size: 14px;
+  }
+
+  /* -----------------------------
+     Forms (Admin + Public)
+     ----------------------------- */
+
+  form {
+    width: 100%;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .form-row,
+  .form-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* -----------------------------
+     Tables → Mobile Friendly
+     ----------------------------- */
+
+  table {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+
+  /* -----------------------------
+     Event Pages
+     ----------------------------- */
+
+  .event-header {
+    text-align: center;
+    gap: 8px;
+  }
+
+  .event-title {
+    font-size: 22px;
+  }
+
+  .event-meta {
+    font-size: 14px;
+  }
+
+  /* Slots */
+  .slot-row,
+  .slot-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .slot-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* -----------------------------
+     Admin Pages
+     ----------------------------- */
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .admin-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* -----------------------------
+     Admin Index (Dashboard)
+     ----------------------------- */
+
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* -----------------------------
+     Check-in Pages
+     ----------------------------- */
+
+  .checkin-container {
+    padding: 16px;
+  }
+
+  .checkin-name {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .checkin-status {
+    font-size: 14px;
+  }
+
+  /* -----------------------------
+     QR Pages
+     ----------------------------- */
+
+  .qr-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .qr-wrapper canvas,
+  .qr-wrapper img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* -----------------------------
+     Buttons Groups
+     ----------------------------- */
+
+  .button-row,
+  .actions-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* -----------------------------
+     Reports
+     ----------------------------- */
+
+  .report-summary {
+    grid-template-columns: 1fr !important;
+  }
+
+  .report-card {
+    padding: 14px;
+  }
+
+  /* -----------------------------
+     Utility
+     ----------------------------- */
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .text-center-mobile {
+    text-align: center;
+  }
+
+}
