@@ -1,7 +1,9 @@
 import { supabase } from "../supabaseClient.js";
 import { loadNavbar } from "../components/navbar.js";
+import { loadFooter } from "/js/components/footer.js";
 
 loadNavbar();
+loadFooter();
 
 const eventSelect = document.getElementById("eventSelect");
 const exportBtn = document.getElementById("exportBtn");
@@ -458,4 +460,5 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
 
