@@ -26,8 +26,8 @@ if (!eventId) {
 }
 
 // Wire buttons
-manageSlotsLink.href = `/signupsigninv2/admin/edit-event.html?id=${eventId}`;
-checkinLink.href = `/signupsigninv2/admin/checkin.html?id=${eventId}`;
+manageSlotsLink.href = `/admin/edit-event.html?id=${eventId}`;
+checkinLink.href = `/admin/checkin.html?id=${eventId}`;
 
 document.addEventListener("DOMContentLoaded", () => {
   loadEvent();
