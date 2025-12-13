@@ -19,7 +19,7 @@ if (!eventId) {
 }
 
 const checkinUrl =
-  `${window.location.origin}/signupsigninv2/checkin.html?event_id=${eventId}`;
+  `${window.location.origin}/checkin.html?event_id=${eventId}`;
 
 urlInput.value = checkinUrl;
 openBtn.href = checkinUrl;
