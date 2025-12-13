@@ -261,3 +261,19 @@
   }
 
 }
+
+ /* -----------------------------
+     MOBILE
+     ----------------------------- */
+
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-right {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
