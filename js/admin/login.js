@@ -1,7 +1,9 @@
 import { supabase } from "../supabaseClient.js";
 import { loadNavbar } from "../components/navbar.js";
+import { loadFooter } from "/js/components/footer.js";
 
 loadNavbar();
+loadFooter();
 
 const form = document.getElementById("loginForm");
 const statusEl = document.getElementById("status");
