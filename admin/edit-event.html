@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Edit Event — signUPsignIN</title>
+  <title>SignUP SignIN - Edit Event</title>
 
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/layout.css" />
@@ -162,8 +162,10 @@
   <script type="module">
     import { supabase } from "../js/supabaseClient.js";
     import { loadNavbar } from "../js/components/navbar.js";
+    import { loadFooter } from "/js/components/footer.js";
 
     loadNavbar();
+    loadFooter();
 
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get("id");
@@ -606,6 +608,7 @@ async function duplicateSlot(slotId) {
 
 </body>
 </html>
+
 
 
 
