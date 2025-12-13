@@ -7,7 +7,7 @@ const form = document.getElementById("loginForm");
 const statusEl = document.getElementById("status");
 
 const params = new URLSearchParams(window.location.search);
-const next = params.get("next") || "/signupsigninv2/admin/events.html";
+const next = params.get("next") || "/admin/events.html";
 
 // If already logged in, bounce to next
 (async function autoRedirectIfLoggedIn() {
