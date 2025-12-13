@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Attendance Report</title>
+  <title>SignUP SignIN - Attendance Report</title>
 
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/layout.css" />
@@ -26,10 +26,12 @@
   <script type="module">
     import { requireAuth } from "../js/admin/utils/auth.js";
     import { loadNavbar } from "../js/components/navbar.js";
+    import { loadFooter } from "/js/components/footer.js";
     import { loadAttendance } from "../js/admin/reports/attendance.js";
 
     await requireAuth();
     loadNavbar();
+    loadFooter();
 
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get("event_id");
