@@ -1,41 +1,98 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-
-  <!-- Open Graph / Link Preview -->
-  <meta property="og:title" content="SignUp SignIN" />
-  <meta property="og:description" content="Forged mat-side • Pittsburgh, PA" />
-  <meta property="og:image" content="https://signupsignin.com/assets/og-preview.jpg" />
-  <meta property="og:url" content="https://signupsignin.com" />
-  <meta property="og:type" content="website" />
-  
-  <title>SignUP SignIN — Events</title>
-
-  <!-- Base styles -->
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/mobile.css">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Sports-first sign-ups and real-time check-in for teams, boosters, and tournament crews. Create a schedule in minutes, share one link, run game day without chaos." name="description"/><meta charset="utf-8"/>
+<!-- Open Graph / Link Preview -->
+<meta content="SignUp SignIN" property="og:title"/>
+<meta content="Sports-first sign-ups + check-in. Run game day without chaos." property="og:description"/>
+<meta content="https://signupsignin.com/assets/og-preview.jpg" property="og:image"/>
+<meta content="https://signupsignin.com" property="og:url"/>
+<meta content="website" property="og:type"/>
+<title>SignUP SignIN — Game-Day Signups</title>
+<!-- Base styles -->
+<link href="css/base.css" rel="stylesheet"/>
+<link href="css/layout.css" rel="stylesheet"/>
+<link href="css/components.css" rel="stylesheet"/>
+<link href="css/mobile.css" rel="stylesheet"/>
 </head>
-
 <body>
+<!-- Navbar placeholder -->
+<div id="navbar"></div>
+<main class="container">
+<section class="section">
+<div class="card" style="padding: 24px;">
+<h1 style="margin-bottom: 8px;">Run game day without chaos.</h1>
+<p class="helper-text" style="font-size: 1.05rem; margin-bottom: 16px;">
+      SignUP SignIN is built for sports teams and booster groups: create a schedule in minutes, share one clean link, and keep everyone on the same page.
+    </p>
+<div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom: 16px;">
+<a class="btn btn-primary" href="/admin/index.html">Create a Sign‑Up</a>
+<a class="btn btn-secondary" href="#events">Find an Event</a>
+</div>
+<div class="splash-points" style="margin:0;">
+<div>✓ Concessions, snacks, carpools, volunteers, tournament crews</div>
+<div>✓ Clean mobile experience (no clutter)</div>
+<div>✓ Real-time roster and tracking (check‑in tools coming next)</div>
+</div>
+</div>
+</section>
+<section class="section">
+<h2 style="margin-bottom: 8px;">Popular sports templates</h2>
+<p class="helper-text" style="margin-bottom: 12px;">Start fast. Copy these formats and tweak them for your team.</p>
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+<div class="card" style="padding: 16px;">
+<strong>Concessions Shifts</strong>
+<p class="helper-text">2–3 hour shifts, role notes, easy swaps.</p>
+</div>
+<div class="card" style="padding: 16px;">
+<strong>Snack Schedule</strong>
+<p class="helper-text">Track who brings what, when, and for which game.</p>
+</div>
+<div class="card" style="padding: 16px;">
+<strong>Carpool / Drivers</strong>
+<p class="helper-text">Seats, pickup points, and confirmation in one spot.</p>
+</div>
+<div class="card" style="padding: 16px;">
+<strong>Tournament Volunteer Crew</strong>
+<p class="helper-text">Admissions, table workers, weigh‑in, hospitality.</p>
+</div>
+</div>
+</section>
+<section class="section">
+<h2 style="margin-bottom: 8px;">How it works</h2>
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+<div class="card" style="padding: 16px;">
+<strong>1) Create</strong>
+<p class="helper-text">Set slots, limits, notes, and contact info.</p>
+</div>
+<div class="card" style="padding: 16px;">
+<strong>2) Share</strong>
+<p class="helper-text">One link for parents and volunteers. No confusion.</p>
+</div>
+<div class="card" style="padding: 16px;">
+<strong>3) Run game day</strong>
+<p class="helper-text">Track signups in real time and stay organized.</p>
+</div>
+</div>
+</section>
 
-  <!-- Navbar placeholder -->
-  <div id="navbar"></div>
+<section class="section" id="events">
+<h1>Events</h1>
+<p class="helper-text">Pick an event below to view details and grab a slot.</p>
+</section>
+<section class="section" id="eventList"></section>
+</main>
+<section class="section" style="margin-top: 8px;">
+<div class="card" style="padding: 16px;">
+<strong>Coming next for sports</strong>
+<div class="helper-text" style="margin-top: 6px;">
+      QR check‑in • waitlist auto‑fill • group messaging (only the people who need the update)
+    </div>
+</div>
+</section>
 
-  <main class="container">
-
-    <section class="section">
-      <h1>Upcoming Events</h1>
-      <p class="helper-text">Choose an event below to view details and sign up for available slots.</p>
-    </section>
-
-    <section id="eventList" class="section"></section>
-
-  </main>
-
-  <script type="module">
+<script type="module">
     import { supabase } from "./js/supabaseClient.js";
     import { loadNavbar } from "./js/components/navbar.js";
     import { loadFooter } from "/js/components/footer.js";
@@ -97,34 +154,22 @@
     loadEvents();
     loadFooter();
   </script>
-
-<div id="splashOverlay" class="splash-overlay hidden">
-  <div class="splash-modal">
-    <button class="splash-close" id="closeSplash">×</button>
-
-    <img src="assets/assetBLUE.svg" alt="SUSI Logo" width="200" height=auto>
-    <p class="splash-sub">
-      A simpler way to organize volunteers for events.
-    </p>
-
-    <div class="splash-points">
-      <div>✓ Create an event in minutes</div>
-      <div>✓ Share one simple link</div>
-      <div>✓ Track signups in real time</div>
-    </div>
-
-    <div class="splash-actions">
-      <a href="/admin/index.html" class="btn btn-primary">
+<div class="splash-overlay hidden" id="splashOverlay">
+<div class="splash-modal">
+<button class="splash-close" id="closeSplash">×</button>
+<img alt="SUSI Logo" height="auto" src="assets/assetBLUE.svg" width="200"/>
+<p class="splash-sub">Built for sports teams: fast sign-ups, clean links, real-time tracking.</p>
+<div class="splash-points"><div>✓ Create a sign‑up in minutes</div><div>✓ Share one clean link (mobile-first)</div><div>✓ Track volunteers in real time</div></div>
+<div class="splash-actions">
+<a class="btn btn-primary" href="/admin/index.html">
         Create an Event
       </a>
-      <button id="continueBtn" class="btn btn-secondary">
+<button class="btn btn-secondary" id="continueBtn">
         Find an Event
       </button>
-    </div>
-  </div>
 </div>
-
+</div>
+</div>
 <script src="./js/splash.js"></script>
-  
 </body>
 </html>
